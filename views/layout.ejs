@@ -16,6 +16,13 @@
   <meta name="twitter:title" content="<%= seoTitle || pageTitle %>">
   <meta name="twitter:description" content="<%= seoDescription %>">
   <meta name="robots" content="<%= robots || 'index, follow' %>">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18203994396"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'AW-18203994396');
+  </script>
   <link rel="stylesheet" href="/css/style.css?v=20260629-ads-compliance">
   <% if (currentPath.startsWith('/admin')) { %>
     <link rel="stylesheet" href="/css/admin.css?v=20260629-saas-dashboard">
