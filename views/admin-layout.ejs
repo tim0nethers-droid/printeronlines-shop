@@ -12,5 +12,8 @@
   <div class="toast-container"></div>
   <%- body %>
   <script src="/js/admin.js?v=20260629-saas-dashboard"></script>
+  <% if (currentPath.startsWith('/admin/live')) { %>
+    <script src="/js/admin-live.js?v=20260629-session-fix"></script>
+  <% } %>
 </body>
 </html>

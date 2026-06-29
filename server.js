@@ -701,8 +701,9 @@ app.post('/admin/tickets/:token/status', requireAdmin, asyncRoute(async (req, re
 }));
 
 app.get('/admin/live', requireAdmin, (req, res, next) => {
-  renderPage(req, res, next, 'admin-live', {
-    pageTitle: 'Admin Live Chat'
+  renderAdminPage(req, res, next, 'admin-live', {
+    pageTitle: 'Admin Live Chat',
+    toast: ''
   });
 });
 
@@ -789,14 +790,15 @@ app.get('/admin/reports', requireAdmin, asyncRoute(async (req, res, next) => {
     readJson(CHATS_FILE, []),
     readJson(VISITS_FILE, [])
   ]);
-  renderPage(req, res, next, 'admin-reports', {
+  renderAdminPage(req, res, next, 'admin-reports', {
     pageTitle: 'Admin Reports',
     filters,
     counts: {
       tickets: filterByDateAndProduct(tickets, filters).length,
       chats: filterByDateAndProduct(chats, filters).length,
       visits: filterByDateAndProduct(visits, filters).length
-    }
+    },
+    toast: ''
   });
 }));
 
