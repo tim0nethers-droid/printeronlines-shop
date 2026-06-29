@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Independent Microsoft product information and service request portal.">
+  <title><%= pageTitle %></title>
+  <link rel="stylesheet" href="/css/style.css?v=20260629-ads-compliance">
+  <% if (currentPath.startsWith('/admin')) { %>
+    <link rel="stylesheet" href="/css/admin.css?v=20260629-saas-dashboard">
+  <% } %>
+</head>
+<body>
+  <div class="site-shell">
+    <% if (!guidePage) { %>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="Home">
+        <span class="brand-mark">MP</span>
+        <span>
+          <strong>Product Request Portal</strong>
+          <small>Independent requests</small>
+        </span>
+      </a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a class="<%= currentPath === '/' ? 'active' : '' %>" href="/">Home</a>
+        <a class="<%= currentPath.startsWith('/products') || currentPath.startsWith('/product') ? 'active' : '' %>" href="/products">Products</a>
+        <a class="<%= currentPath.startsWith('/request') ? 'active' : '' %>" href="/request">Request</a>
+        <a class="<%= currentPath.startsWith('/chat') ? 'active' : '' %>" href="/chat">Chat</a>
+      </nav>
+    </header>
+    <% } %>
+
+    <main>
+      <%- body %>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-grid">
+        <div>
+          <strong>Product Request Portal</strong>
+          <p><%= disclaimer %></p>
+        </div>
+        <nav aria-label="Footer navigation">
+          <a href="/privacy">Privacy Policy</a>
+          <a href="/terms">Terms</a>
+          <a href="/disclaimer">Disclaimer</a>
+          <a href="/ad-transparency">Ad Transparency</a>
+          <a href="/contact">Contact</a>
+          <% if (isAdmin) { %>
+            <a href="/admin/dashboard">Admin</a>
+          <% } else { %>
+            <a href="/admin/login">Admin Login</a>
+          <% } %>
+        </nav>
+      </div>
+    </footer>
+  </div>
+  <script src="/js/main.js?v=20260629-ads-compliance"></script>
+  <% if (currentPath.startsWith('/admin')) { %>
+    <script src="/js/admin.js?v=20260629-saas-dashboard"></script>
+  <% } %>
+  <% if (currentPath.startsWith('/chat')) { %>
+    <script src="/js/chat.js?v=20260629-ads-compliance"></script>
+  <% } %>
+  <% if (currentPath.startsWith('/admin/live')) { %>
+    <script src="/js/admin-live.js?v=20260629-live-admin"></script>
+  <% } %>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<section class="page-hero compact">
+  <div>
+    <span class="eyebrow">Service request</span>
+    <h1>Start a product request</h1>
+    <p>Share basic contact details, choose the product, and describe the issue for review.</p>
+    <p class="disclaimer-note"><%= disclaimer %></p>
+  </div>
+</section>
+
+<section class="section form-section">
+  <div class="selected-product-panel">
+    <div class="product-logo <%= selectedProduct.iconClass %>" aria-hidden="true"><span><%= selectedProduct.iconText %></span></div>
+    <div>
+      <span class="eyebrow">Selected Product</span>
+      <h2><%= selectedProduct.name %></h2>
+    </div>
+  </div>
+  <form class="portal-form" action="/request" method="post" novalidate>
+    <div class="form-grid">
+      <label>
+        Name
+        <input name="name" autocomplete="name" value="<%= formValues.name || '' %>" required>
+        <% if (errors.name) { %><span class="field-error"><%= errors.name %></span><% } %>
+      </label>
+      <label>
+        Phone
+        <input name="phone" autocomplete="tel" value="<%= formValues.phone || '' %>" required>
+        <% if (errors.phone) { %><span class="field-error"><%= errors.phone %></span><% } %>
+      </label>
+      <label>
+        Email
+        <input name="email" type="email" autocomplete="email" value="<%= formValues.email || '' %>" required>
+        <% if (errors.email) { %><span class="field-error"><%= errors.email %></span><% } %>
+      </label>
+      <label>
+        Product
+        <select name="product" class="js-product-select" data-category-target="requestIssue" required>
+          <% products.forEach((product) => { %>
+            <option value="<%= product.slug %>" <%= product.slug === formValues.product ? 'selected' : '' %>>[<%= product.iconText %>] <%= product.name %></option>
+          <% }) %>
+        </select>
+        <% if (errors.product) { %><span class="field-error"><%= errors.product %></span><% } %>
+      </label>
+      <label class="full">
+        Issue Category
+        <select id="requestIssue" name="issueCategory" required>
+          <% selectedProduct.categories.forEach((category) => { %>
+            <option value="<%= categoryTitle(category) %>" <%= categoryTitle(category) === formValues.issueCategory ? 'selected' : '' %>><%= categoryTitle(category) %></option>
+          <% }) %>
+        </select>
+        <% if (errors.issueCategory) { %><span class="field-error"><%= errors.issueCategory %></span><% } %>
+      </label>
+      <label class="full">
+        Message
+        <textarea name="message" rows="7" required><%= formValues.message || '' %></textarea>
+        <% if (errors.message) { %><span class="field-error"><%= errors.message %></span><% } %>
+      </label>
+    </div>
+    <p class="form-note">Please do not include account secrets, one-time codes, recovery codes, card details, or device-control details.</p>
+    <button class="button primary" type="submit">Submit request</button>
+  </form>
+</section>

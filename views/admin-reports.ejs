@@ -1,0 +1,55 @@
+<section class="admin-header">
+  <div>
+    <span class="eyebrow">Admin</span>
+    <h1>Reports</h1>
+  </div>
+  <div class="admin-actions">
+    <a class="button secondary" href="/admin/dashboard">Dashboard</a>
+    <a class="button secondary" href="/admin/live">Live Chat</a>
+  </div>
+</section>
+
+<section class="section admin-section">
+  <form class="filter-bar" method="get" action="/admin/reports">
+    <label>
+      Date
+      <input type="date" name="date" value="<%= filters.date %>">
+    </label>
+    <label>
+      Product
+      <select name="product">
+        <option value="">All products</option>
+        <% products.forEach((product) => { %>
+          <option value="<%= product.slug %>" <%= product.slug === filters.product ? 'selected' : '' %>>[<%= product.iconText %>] <%= product.name %></option>
+        <% }) %>
+      </select>
+    </label>
+    <button class="button secondary" type="submit">Apply</button>
+  </form>
+
+  <div class="stat-grid">
+    <article class="stat-card">
+      <span>Requests</span>
+      <strong><%= counts.tickets %></strong>
+    </article>
+    <article class="stat-card">
+      <span>Chats</span>
+      <strong><%= counts.chats %></strong>
+    </article>
+    <article class="stat-card">
+      <span>Visits</span>
+      <strong><%= counts.visits %></strong>
+    </article>
+  </div>
+
+  <div class="export-panel">
+    <h2>Export JSON</h2>
+    <% const query = `date=${encodeURIComponent(filters.date || '')}&product=${encodeURIComponent(filters.product || '')}`; %>
+    <div class="hero-actions">
+      <a class="button primary" href="/admin/reports/export?type=all&<%= query %>">All data</a>
+      <a class="button secondary" href="/admin/reports/export?type=tickets&<%= query %>">Requests</a>
+      <a class="button secondary" href="/admin/reports/export?type=chats&<%= query %>">Chats</a>
+      <a class="button secondary" href="/admin/reports/export?type=visits&<%= query %>">Visits</a>
+    </div>
+  </div>
+</section>

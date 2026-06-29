@@ -1,0 +1,39 @@
+<section class="page-hero compact">
+  <div>
+    <span class="eyebrow">Request received</span>
+    <h1>Thank you</h1>
+    <% if (token) { %>
+      <p>Your request token is shown below. Keep it for reference.</p>
+    <% } else { %>
+      <p>The request was received, but no token was supplied for this page.</p>
+    <% } %>
+    <p class="disclaimer-note"><%= disclaimer %></p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="success-card">
+    <span class="success-label">Ticket token</span>
+    <strong><%= token || 'Unavailable' %></strong>
+    <% if (ticket) { %>
+      <dl class="ticket-summary">
+        <div>
+          <dt>Product</dt>
+          <dd><%= ticket.product %></dd>
+        </div>
+        <div>
+          <dt>Issue</dt>
+          <dd><%= ticket.issueCategory %></dd>
+        </div>
+        <div>
+          <dt>Status</dt>
+          <dd><%= ticket.status %></dd>
+        </div>
+      </dl>
+    <% } %>
+    <div class="hero-actions">
+      <a class="button primary" href="/products">Browse products</a>
+      <a class="button secondary" href="/chat">Open chat</a>
+    </div>
+  </div>
+</section>

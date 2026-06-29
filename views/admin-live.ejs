@@ -1,0 +1,49 @@
+<section class="admin-header">
+  <div>
+    <span class="eyebrow">Admin</span>
+    <h1>Live Chat</h1>
+  </div>
+  <div class="admin-actions">
+    <a class="button secondary" href="/admin/dashboard">Dashboard</a>
+    <a class="button secondary" href="/admin/reports">Reports</a>
+  </div>
+</section>
+
+<section class="section admin-live">
+  <aside class="visitor-panel">
+    <div class="panel-top">
+      <label>
+        Product
+        <select id="liveProductFilter">
+          <option value="">All products</option>
+          <% products.forEach((product) => { %>
+            <option value="<%= product.slug %>">[<%= product.iconText %>] <%= product.name %></option>
+          <% }) %>
+        </select>
+      </label>
+      <label class="toggle-row">
+        <input type="checkbox" id="soundToggle">
+        New message sound
+      </label>
+    </div>
+    <div class="visitor-list" id="visitorList" aria-live="polite"></div>
+  </aside>
+
+  <section class="conversation-panel">
+    <div class="conversation-meta" id="conversationMeta">
+      <p>Select a visitor conversation.</p>
+    </div>
+    <div class="messages admin-messages" id="adminMessages"></div>
+    <form class="chat-reply" id="adminReplyForm">
+      <label class="sr-only" for="adminReply">Reply</label>
+      <input id="adminReply" name="message" autocomplete="off" placeholder="Type a reply">
+      <button class="button primary" type="submit">Reply</button>
+    </form>
+    <div class="status-controls">
+      <button type="button" data-chat-status="Open">Open</button>
+      <button type="button" data-chat-status="In Progress">In Progress</button>
+      <button type="button" data-chat-status="Closed">Closed</button>
+    </div>
+    <div class="form-error" id="adminLiveError" hidden></div>
+  </section>
+</section>

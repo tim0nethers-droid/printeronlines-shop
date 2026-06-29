@@ -1,0 +1,110 @@
+<section class="hero">
+  <div class="hero-content">
+    <span class="eyebrow">Independent product request intake</span>
+    <h1>Microsoft Product Information & Service Request Portal</h1>
+    <p class="hero-copy">Search common product topics, choose a product, and send a service request with only the basic details needed for review.</p>
+    <p class="disclaimer-note"><%= disclaimer %></p>
+    <div class="hero-actions">
+      <a class="button primary" href="/request">Start request</a>
+      <a class="button secondary" href="/chat">Message intake</a>
+    </div>
+  </div>
+  <div class="hero-panel" aria-label="Product search">
+    <label for="productSearch">Search product</label>
+    <div class="search-box">
+      <span aria-hidden="true">⌕</span>
+      <input id="productSearch" type="search" placeholder="Try Excel, Outlook, Teams, Azure">
+    </div>
+    <div class="quick-links">
+      <% popularProducts.slice(0, 4).forEach((product) => { %>
+        <a href="/product/<%= product.slug %>"><%= product.name %></a>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<section class="section popular-apps">
+  <div class="section-heading">
+    <span class="eyebrow">Popular Microsoft Apps</span>
+    <h2>Frequently requested app topics</h2>
+    <a href="/products">View all products</a>
+  </div>
+  <div class="product-grid popular-grid">
+    <% popularProducts.forEach((product) => { %>
+      <article class="product-card featured-card" data-name="<%= product.name.toLowerCase() %>" data-categories="<%= product.categories.map(categoryTitle).join(' ').toLowerCase() %>">
+        <a class="product-card-main" href="/product/<%= product.slug %>">
+          <div class="product-logo <%= product.iconClass %>" aria-hidden="true"><span><%= product.iconText %></span></div>
+          <h3><%= product.name %></h3>
+          <p class="product-desc"><%= product.description %></p>
+        </a>
+        <div class="issue-tags">
+          <% product.categories.slice(0, 3).forEach((category) => { %>
+            <span><%= categoryTitle(category) %></span>
+          <% }) %>
+        </div>
+        <div class="card-actions">
+          <a class="btn btn-primary" href="/request?product=<%= product.slug %>">Start Request</a>
+          <a class="btn btn-outline" href="/chat?product=<%= product.slug %>">Message Us</a>
+        </div>
+      </article>
+    <% }) %>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-heading">
+    <span class="eyebrow">Products</span>
+    <h2>Choose a product topic</h2>
+    <a href="/products">View all products</a>
+  </div>
+  <div class="product-grid" id="productGrid">
+    <% featuredProducts.forEach((product) => { %>
+      <article class="product-card" data-name="<%= product.name.toLowerCase() %>" data-categories="<%= product.categories.map(categoryTitle).join(' ').toLowerCase() %>">
+        <a class="product-card-main" href="/product/<%= product.slug %>">
+          <div class="product-logo <%= product.iconClass %>" aria-hidden="true"><span><%= product.iconText %></span></div>
+          <h3><%= product.name %></h3>
+          <p class="product-desc"><%= product.description %></p>
+        </a>
+        <div class="issue-tags">
+          <% product.categories.slice(0, 3).forEach((category) => { %>
+            <span><%= categoryTitle(category) %></span>
+          <% }) %>
+        </div>
+        <div class="card-actions">
+          <a class="btn btn-primary" href="/request?product=<%= product.slug %>">Start Request</a>
+          <a class="btn btn-outline" href="/chat?product=<%= product.slug %>">Message Us</a>
+        </div>
+      </article>
+    <% }) %>
+  </div>
+</section>
+
+<section class="section trust-section">
+  <div class="section-heading">
+    <span class="eyebrow">Advertising transparency</span>
+    <h2>Independent portal with clear request boundaries</h2>
+  </div>
+  <div class="trust-grid">
+    <article>
+      <strong>Independent identity</strong>
+      <p>This website is not affiliated with Microsoft Corporation and does not claim to provide official Microsoft services.</p>
+    </article>
+    <article>
+      <strong>Safe intake only</strong>
+      <p>Forms ask only for name, phone, email, product, issue category, and message. Do not submit passwords, codes, payment data, or remote access details.</p>
+    </article>
+    <article>
+      <strong>Product names for identification</strong>
+      <p>Product names are used only to help visitors choose the relevant topic for an independent request.</p>
+    </article>
+  </div>
+</section>
+
+<section class="band">
+  <div>
+    <span class="eyebrow">Focused intake</span>
+    <h2>Simple forms, clear boundaries</h2>
+    <p>Requests collect only name, phone, email, selected product, issue category, and message. Please keep account secrets and financial details out of messages.</p>
+  </div>
+  <a class="button primary" href="/request">Start request</a>
+</section>

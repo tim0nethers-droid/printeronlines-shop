@@ -1,0 +1,87 @@
+<header class="guide-header">
+  <a class="guide-brand" href="/">
+    <span class="brand-mark">MP</span>
+    <span>
+      <strong>Product Request Portal</strong>
+      <small>Independent product guides</small>
+    </span>
+  </a>
+  <nav class="guide-nav" aria-label="Guide navigation">
+    <a href="/products">Products</a>
+    <a href="/products">AI Tools</a>
+    <a href="/product/<%= selectedProduct.slug %>#articles">Resources</a>
+    <a href="/product/<%= selectedProduct.slug %>#faq">FAQ</a>
+    <a href="/contact">Contact</a>
+  </nav>
+  <div class="guide-actions">
+    <a class="guide-search" href="/products" aria-label="Search products">Search</a>
+    <select aria-label="Language">
+      <option>EN</option>
+      <option>HI</option>
+    </select>
+    <a class="guide-signin" href="/admin/login">Admin</a>
+    <a class="guide-signup" href="/request?product=<%= selectedProduct.slug %>">Start Request</a>
+  </div>
+</header>
+
+<main class="chat-page">
+  <section class="chat-card">
+    <div class="chat-product-logo product-logo <%= selectedProduct.iconClass %>" aria-hidden="true">
+      <span><%= selectedProduct.iconText %></span>
+    </div>
+
+    <h1><%= selectedProduct.name %> Message Intake</h1>
+
+    <p class="chat-subtitle">Independent product information and request intake</p>
+    <p class="chat-disclaimer-small">Not affiliated with Microsoft Corporation</p>
+
+    <div class="chat-status">
+      <span></span>
+      Message intake open
+    </div>
+
+    <form id="chatStartForm" class="chat-start-form" novalidate>
+      <input type="hidden" name="productSlug" value="<%= selectedProduct.slug %>">
+      <input type="hidden" name="product" value="<%= selectedProduct.slug %>">
+      <input type="hidden" name="issue" value="<%= categoryTitle(selectedProduct.categories[0]) %>">
+
+      <label for="chatName">Full Name</label>
+      <input id="chatName" type="text" name="name" placeholder="Full Name" autocomplete="name" required>
+
+      <label for="chatEmail">Email Address</label>
+      <input id="chatEmail" type="email" name="email" placeholder="you@example.com" autocomplete="email" required>
+
+      <label for="chatPhone">Phone Number</label>
+      <input id="chatPhone" type="tel" name="phone" placeholder="Phone Number" autocomplete="tel" required>
+
+      <label for="chatProductDisplay">Product</label>
+      <input id="chatProductDisplay" type="text" value="<%= selectedProduct.name %>" readonly>
+
+      <label for="chatProblem">Describe Your Problem</label>
+      <textarea id="chatProblem" name="message" placeholder="Please describe your issue in detail..." required></textarea>
+
+      <div class="form-error" id="chatStartError" hidden></div>
+      <button type="submit" class="chat-submit-btn">Send Message</button>
+    </form>
+
+    <div id="chatWindow" class="chat-window" hidden>
+      <div class="chat-window-header compact">
+        <div>
+          <span class="eyebrow">Conversation</span>
+          <h2 id="chatTitle"><%= selectedProduct.name %> chat</h2>
+        </div>
+        <span class="status-pill" id="chatStatus">Open</span>
+      </div>
+      <div id="chatMessages" class="chat-messages" aria-live="polite"></div>
+
+      <form id="chatReplyForm" class="chat-reply-form">
+        <label class="sr-only" for="chatMessage">Message</label>
+        <input id="chatMessage" type="text" name="message" placeholder="Type your message..." autocomplete="off" required>
+        <button type="submit">Send</button>
+      </form>
+      <div class="form-error chat-inline-error" id="chatReplyError" hidden></div>
+    </div>
+
+    <p class="chat-footer-disclaimer"><%= disclaimer %></p>
+  </section>
+</main>

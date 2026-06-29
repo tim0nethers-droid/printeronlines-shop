@@ -1,0 +1,83 @@
+<section class="page-hero product-detail">
+  <div>
+    <span class="eyebrow">Product topic</span>
+    <h1><%= product.name %></h1>
+    <p><%= product.description %></p>
+    <p class="disclaimer-note"><%= disclaimer %></p>
+    <div class="hero-actions">
+      <a class="button primary" href="#request-form">Start Service Request</a>
+      <a class="button secondary" href="/chat?product=<%= product.slug %>">Message Us</a>
+    </div>
+  </div>
+  <div class="product-badge">
+    <div class="product-logo product-logo-large <%= product.iconClass %>" aria-hidden="true"><span><%= product.iconText %></span></div>
+    <strong><%= product.name %></strong>
+  </div>
+</section>
+
+<section class="section split">
+  <div>
+    <span class="eyebrow">Common issue categories</span>
+    <h2>Topics for <%= product.name %></h2>
+    <ul class="issue-list">
+          <% product.categories.forEach((category) => { %>
+        <li><%= categoryTitle(category) %></li>
+      <% }) %>
+    </ul>
+  </div>
+  <div class="info-panel">
+    <h2>Before you submit</h2>
+    <p>Use the message field to describe the issue in plain language. Do not include account secrets, codes, card details, or device-control details.</p>
+  </div>
+</section>
+
+<section class="section form-section" id="request-form">
+  <div class="form-intro">
+    <span class="eyebrow">Service request</span>
+    <h2>Start a request for <%= product.name %></h2>
+    <p>Only the fields below are collected for public service requests.</p>
+  </div>
+  <form class="portal-form" action="/request" method="post" novalidate>
+    <div class="form-grid">
+      <label>
+        Name
+        <input name="name" autocomplete="name" value="<%= formValues.name || '' %>" required>
+        <% if (errors.name) { %><span class="field-error"><%= errors.name %></span><% } %>
+      </label>
+      <label>
+        Phone
+        <input name="phone" autocomplete="tel" value="<%= formValues.phone || '' %>" required>
+        <% if (errors.phone) { %><span class="field-error"><%= errors.phone %></span><% } %>
+      </label>
+      <label>
+        Email
+        <input name="email" type="email" autocomplete="email" value="<%= formValues.email || '' %>" required>
+        <% if (errors.email) { %><span class="field-error"><%= errors.email %></span><% } %>
+      </label>
+      <label>
+        Product
+        <select name="product" class="js-product-select" data-category-target="productIssue" required>
+          <% products.forEach((item) => { %>
+            <option value="<%= item.slug %>" <%= item.slug === product.slug ? 'selected' : '' %>>[<%= item.iconText %>] <%= item.name %></option>
+          <% }) %>
+        </select>
+        <% if (errors.product) { %><span class="field-error"><%= errors.product %></span><% } %>
+      </label>
+      <label class="full">
+        Issue Category
+        <select id="productIssue" name="issueCategory" required>
+          <% product.categories.forEach((category) => { %>
+            <option value="<%= categoryTitle(category) %>" <%= categoryTitle(category) === formValues.issueCategory ? 'selected' : '' %>><%= categoryTitle(category) %></option>
+          <% }) %>
+        </select>
+        <% if (errors.issueCategory) { %><span class="field-error"><%= errors.issueCategory %></span><% } %>
+      </label>
+      <label class="full">
+        Message
+        <textarea name="message" rows="6" required><%= formValues.message || '' %></textarea>
+        <% if (errors.message) { %><span class="field-error"><%= errors.message %></span><% } %>
+      </label>
+    </div>
+    <button class="button primary" type="submit">Submit request</button>
+  </form>
+</section>

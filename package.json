@@ -1,0 +1,20 @@
+{
+  "name": "microsoft-product-help-portal",
+  "version": "1.0.0",
+  "description": "Independent Microsoft product information and service request portal built with Node.js, Express, EJS, and JSON storage.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-rate-limit": "^7.5.0",
+    "express-session": "^1.18.1",
+    "helmet": "^8.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,0 +1,25 @@
+<section class="page-hero compact">
+  <div>
+    <span class="eyebrow">Admin</span>
+    <h1>Login</h1>
+    <p>Use the admin credentials configured in the environment.</p>
+    <p class="disclaimer-note"><%= disclaimer %></p>
+  </div>
+</section>
+
+<section class="section form-section narrow">
+  <form class="portal-form" action="/admin/login" method="post">
+    <% if (error) { %>
+      <div class="form-error"><%= error %></div>
+    <% } %>
+    <label>
+      Username
+      <input name="username" autocomplete="username" required>
+    </label>
+    <label>
+      Password
+      <input name="password" type="password" autocomplete="current-password" required>
+    </label>
+    <button class="button primary" type="submit">Login</button>
+  </form>
+</section>

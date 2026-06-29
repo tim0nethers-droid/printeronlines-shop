@@ -1,0 +1,73 @@
+(function () {
+  function filterProducts() {
+    var input = document.getElementById('productSearch');
+    var cards = Array.prototype.slice.call(document.querySelectorAll('.product-card'));
+    var empty = document.getElementById('productEmpty');
+    if (!input || !cards.length) return;
+
+    function applyFilter() {
+      var query = input.value.trim().toLowerCase();
+      var visibleCount = 0;
+      cards.forEach(function (card) {
+        var haystack = [
+          card.getAttribute('data-name') || '',
+          card.getAttribute('data-categories') || ''
+        ].join(' ');
+        var visible = haystack.indexOf(query) !== -1;
+        card.hidden = !visible;
+        if (visible) visibleCount += 1;
+      });
+      if (empty) empty.hidden = visibleCount !== 0;
+    }
+
+    input.addEventListener('input', applyFilter);
+    applyFilter();
+  }
+
+  function syncCategorySelects() {
+    var productSelects = Array.prototype.slice.call(document.querySelectorAll('.js-product-select'));
+    productSelects.forEach(function (productSelect) {
+      productSelect.addEventListener('change', function () {
+        var targetId = productSelect.getAttribute('data-category-target');
+        var categorySelect = targetId ? document.getElementById(targetId) : null;
+        if (!categorySelect || !productSelect.value) return;
+
+        fetch('/api/products/' + encodeURIComponent(productSelect.value))
+          .then(function (response) {
+            if (!response.ok) throw new Error('Product not found');
+            return response.json();
+          })
+          .then(function (data) {
+            categorySelect.innerHTML = '';
+            var categories = data.product.categoryTitles || data.product.categories || [];
+            categories.forEach(function (category) {
+              var title = typeof category === 'string' ? category : category.title;
+              var option = document.createElement('option');
+              option.value = title;
+              option.textContent = title;
+              categorySelect.appendChild(option);
+            });
+          })
+          .catch(function () {
+            categorySelect.innerHTML = '';
+          });
+      });
+    });
+  }
+
+  function enableClickableCards() {
+    var cards = Array.prototype.slice.call(document.querySelectorAll('.clickable-card[data-href]'));
+    cards.forEach(function (card) {
+      card.addEventListener('click', function (event) {
+        if (event.target.closest('a, button, input, select, textarea')) return;
+        window.location.href = card.getAttribute('data-href');
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    filterProducts();
+    syncCategorySelects();
+    enableClickableCards();
+  });
+})();

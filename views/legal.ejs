@@ -1,0 +1,16 @@
+<section class="page-hero compact">
+  <div>
+    <span class="eyebrow">Portal information</span>
+    <h1><%= heading %></h1>
+    <p class="disclaimer-note"><%= disclaimer %></p>
+  </div>
+</section>
+
+<section class="section legal-content">
+  <% sections.forEach((section) => { %>
+    <article>
+      <h2><%= section.title %></h2>
+      <p><%= section.body %></p>
+    </article>
+  <% }) %>
+</section>

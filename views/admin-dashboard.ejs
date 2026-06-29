@@ -1,0 +1,259 @@
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <div class="admin-brand">
+      <div class="admin-brand-logo">MP</div>
+      <div>
+        <strong>Product Help Portal</strong>
+        <small>Admin Panel</small>
+      </div>
+    </div>
+
+    <nav class="admin-nav" aria-label="Admin navigation">
+      <a class="active" href="/admin/dashboard">Dashboard</a>
+      <a href="/admin/live">Live Chat <span class="nav-badge"><%= stats.openChats || 0 %></span></a>
+      <a href="/admin/dashboard">Requests <span class="nav-badge"><%= stats.totalRequests || 0 %></span></a>
+      <a href="/admin/reports">Reports</a>
+      <a href="/admin/reports">Visitors</a>
+      <a href="/admin/dashboard">Settings</a>
+      <form class="sidebar-logout" action="/admin/logout" method="post">
+        <button type="submit">Logout</button>
+      </form>
+    </nav>
+
+    <div class="sidebar-help-card">
+      <h3>Need Help?</h3>
+      <p>Open the live chat workspace to review and answer visitor messages.</p>
+      <a href="/admin/live">Open Live Chat</a>
+    </div>
+
+  </aside>
+
+  <main class="admin-main">
+    <header class="admin-topbar">
+      <div class="admin-title">
+        <h1>Dashboard</h1>
+        <p>Welcome back! Here's what's happening today.</p>
+      </div>
+
+      <div class="admin-top-actions">
+        <div class="admin-search">
+          <input type="search" placeholder="Search requests, chats, visitors..." aria-label="Search admin records">
+        </div>
+        <div class="admin-date">
+          <%= new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %><br>
+          <%= new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) %>
+        </div>
+        <div class="admin-user-badge">AU</div>
+      </div>
+    </header>
+
+    <section class="admin-hero">
+      <div class="hero-left">
+        <div class="hero-icon">DATA</div>
+        <div>
+          <h2>Admin Command Center</h2>
+          <p>Track service requests, live chats, visitors, and product activity in one place.</p>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="/admin/live">Live Chat</a>
+        <a href="/admin/reports">Reports</a>
+        <a data-toast-export href="/admin/reports/export?type=all">Export Data</a>
+      </div>
+    </section>
+
+    <section class="admin-filter-card">
+      <form class="admin-filter-row" method="get" action="/admin/dashboard">
+        <div class="admin-field">
+          <label for="productFilter">Product Filter</label>
+          <select id="productFilter" name="product">
+            <option value="">All Products</option>
+            <% products.forEach((product) => { %>
+              <option value="<%= product.slug %>" <%= product.slug === productFilter ? 'selected' : '' %>><%= product.name %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div class="admin-field">
+          <label for="statusFilter">Status Filter</label>
+          <select id="statusFilter" name="status">
+            <option value="">All Statuses</option>
+            <% allowedStatuses.forEach((status) => { %>
+              <option value="<%= categorySlug(status) %>" <%= categorySlug(status) === statusFilter ? 'selected' : '' %>><%= status %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <button class="admin-btn primary" type="submit">Apply Filters</button>
+        <a class="admin-btn" data-toast-reset href="/admin/dashboard">Reset</a>
+      </form>
+    </section>
+
+    <section class="admin-stat-grid">
+      <article class="admin-stat-card">
+        <div class="stat-icon blue">REQ</div>
+        <div>
+          <p>Total Requests</p>
+          <strong><%= stats.totalRequests || 0 %></strong>
+          <small>service tickets</small>
+        </div>
+      </article>
+
+      <article class="admin-stat-card">
+        <div class="stat-icon green">CHAT</div>
+        <div>
+          <p>Open Chats</p>
+          <strong><%= stats.openChats || 0 %></strong>
+          <small>active conversations</small>
+        </div>
+      </article>
+
+      <article class="admin-stat-card">
+        <div class="stat-icon purple">VIS</div>
+        <div>
+          <p>Today Visitors</p>
+          <strong><%= stats.todayVisitors || 0 %></strong>
+          <small>unique visitors</small>
+        </div>
+      </article>
+
+      <article class="admin-stat-card">
+        <div class="stat-icon orange">PEND</div>
+        <div>
+          <p>Pending Tickets</p>
+          <strong><%= stats.pendingTickets || 0 %></strong>
+          <small>need response</small>
+        </div>
+      </article>
+    </section>
+
+    <section class="admin-content-grid">
+      <div class="admin-table-card">
+        <div class="admin-card-header">
+          <h2>Latest Requests</h2>
+          <div>
+            <a class="admin-btn" href="/admin/dashboard">View All</a>
+            <a class="admin-btn" data-toast-export href="/admin/reports/export?type=tickets">Export</a>
+          </div>
+        </div>
+
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Token</th>
+                <th>Contact</th>
+                <th>Product</th>
+                <th>Issue</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (!latestRequests || latestRequests.length === 0) { %>
+                <tr>
+                  <td colspan="7">
+                    <div class="empty-state admin-empty">
+                      <div class="empty-state-icon">REQ</div>
+                      <h3>No requests yet</h3>
+                      <p>New service requests will appear here.</p>
+                    </div>
+                  </td>
+                </tr>
+              <% } else { %>
+                <% latestRequests.forEach((ticket) => { %>
+                  <% const ticketProduct = products.find((item) => item.slug === ticket.productSlug); %>
+                  <tr>
+                    <td><strong><%= ticket.token %></strong></td>
+                    <td class="request-contact">
+                      <strong><%= ticket.name %></strong>
+                      <small><%= ticket.email %></small>
+                      <small>Phone: <%= ticket.phone || 'Not provided' %></small>
+                    </td>
+                    <td>
+                      <span class="product-mini">
+                        <% if (ticketProduct) { %>
+                          <span class="product-logo product-logo-tiny <%= ticketProduct.iconClass %>" aria-hidden="true"><span><%= ticketProduct.iconText %></span></span>
+                        <% } %>
+                        <%= ticket.product %>
+                      </span>
+                    </td>
+                    <td><%= ticket.issueCategory %></td>
+                    <td>
+                      <span class="status-badge status-<%= categorySlug(ticket.status) %>"><%= ticket.status %></span>
+                    </td>
+                    <td><%= new Date(ticket.createdAt).toLocaleString() %></td>
+                    <td>
+                      <form class="admin-status-form" action="/admin/tickets/<%= ticket.token %>/status" method="post">
+                        <input type="hidden" name="productFilter" value="<%= productFilter %>">
+                        <input type="hidden" name="statusFilter" value="<%= statusFilter %>">
+                        <select name="status" aria-label="Update status for <%= ticket.token %>">
+                          <% allowedStatuses.forEach((status) => { %>
+                            <option value="<%= status %>" <%= status === ticket.status ? 'selected' : '' %>><%= status %></option>
+                          <% }) %>
+                        </select>
+                        <button type="submit">Update</button>
+                      </form>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <aside class="admin-side-stack">
+        <div class="admin-side-card">
+          <div class="admin-card-header compact">
+            <h2>Recent Live Chats</h2>
+            <a href="/admin/live">View All</a>
+          </div>
+
+          <div class="recent-chat-list">
+            <% if (!recentChats || recentChats.length === 0) { %>
+              <div class="empty-state small">
+                <p>No recent chats</p>
+              </div>
+            <% } else { %>
+              <% recentChats.forEach((chat) => { %>
+                <% const chatProduct = products.find((item) => item.slug === chat.productSlug); %>
+                <% const lastMessage = chat.messages && chat.messages.length ? chat.messages[chat.messages.length - 1].text : 'No message yet'; %>
+                <a class="recent-chat-item" href="/admin/live?session=<%= chat.id %>">
+                  <div class="avatar"><%= chat.visitor && chat.visitor.name ? chat.visitor.name[0].toUpperCase() : 'U' %></div>
+                  <div>
+                    <strong><%= chat.visitor ? chat.visitor.name : 'Unknown visitor' %></strong>
+                    <p>
+                      <% if (chatProduct) { %>
+                        <span class="product-logo product-logo-tiny <%= chatProduct.iconClass %>" aria-hidden="true"><span><%= chatProduct.iconText %></span></span>
+                      <% } %>
+                      <%= chat.product %>
+                    </p>
+                    <small><%= lastMessage %></small>
+                  </div>
+                  <span class="status-badge status-<%= categorySlug(chat.status) %>"><%= chat.status %></span>
+                </a>
+              <% }) %>
+            <% } %>
+          </div>
+        </div>
+
+        <div class="admin-side-card">
+          <h2>Quick Actions</h2>
+          <div class="quick-action-grid">
+            <a href="/admin/live">Open Live Chat</a>
+            <a href="/admin/reports">View Reports</a>
+            <a data-toast-export href="/admin/reports/export?type=all">Export Data</a>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <footer class="admin-footer">
+      <span>© <%= new Date().getFullYear() %> Product Help Portal. All rights reserved.</span>
+      <span>This is an independent service portal. Not affiliated with Microsoft Corporation.</span>
+    </footer>
+  </main>
+</div>

@@ -1,0 +1,145 @@
+<header class="guide-header">
+  <a class="guide-brand" href="/">
+    <span class="brand-mark">MP</span>
+    <span>
+      <strong>Product Request Portal</strong>
+      <small>Independent product guides</small>
+    </span>
+  </a>
+  <nav class="guide-nav" aria-label="Guide navigation">
+    <a href="/">Home</a>
+    <a href="/products">Products</a>
+    <a href="/products">AI Tools</a>
+    <a href="#articles">Resources</a>
+    <a href="#faq">FAQ</a>
+    <a href="/contact">Contact</a>
+  </nav>
+  <div class="guide-actions">
+    <a class="guide-search" href="/products" aria-label="Search products">Search</a>
+    <select aria-label="Language">
+      <option>English</option>
+      <option>Hindi</option>
+    </select>
+    <a class="guide-signin" href="/admin/login">Admin</a>
+    <a class="guide-signup" href="/request?product=<%= product.slug %>">Start Request</a>
+  </div>
+</header>
+
+<section class="product-hero <%= product.bannerClass %>">
+  <div class="product-hero-left">
+    <div class="product-logo product-logo-large <%= product.iconClass %>" aria-hidden="true">
+      <span><%= product.iconText %></span>
+    </div>
+    <div>
+      <h1><%= product.pageTitle %></h1>
+      <p>Independent resource &mdash; not affiliated with Microsoft Corporation</p>
+    </div>
+  </div>
+
+  <div class="product-hero-actions">
+    <a href="#articles" class="hero-btn"><%= product.name %> Articles</a>
+    <a href="/products" class="hero-btn">All Products</a>
+  </div>
+</section>
+
+<nav class="product-tabs" aria-label="Product help sections">
+  <a class="active" href="#troubleshooter">Troubleshooter</a>
+  <a href="#articles">Articles</a>
+  <a href="/request?product=<%= product.slug %>">Submit Ticket</a>
+</nav>
+
+<main class="product-help-layout">
+  <section class="product-main">
+    <div class="fast-help-card">
+      <div class="fast-help-icon">BOT</div>
+      <div>
+        <h2>Have a product question?</h2>
+        <p>Send a message to our independent request intake team.</p>
+      </div>
+      <a href="/chat?product=<%= product.slug %>" class="btn-danger">Send Message</a>
+    </div>
+
+    <div class="guide-alert">
+      Or select your issue below for step-by-step guidance.
+    </div>
+
+    <div class="troubleshooter-card" id="troubleshooter">
+      <h2>What are you having trouble with?</h2>
+      <p>Select your issue for step-by-step solutions.</p>
+
+      <div class="issue-grid">
+        <% product.categories.forEach(function(issue) { %>
+          <a class="issue-card <%= selectedIssue && selectedIssue.slug === issue.slug ? 'active' : '' %>" href="/product/<%= product.slug %>/issue/<%= issue.slug %>">
+            <div class="issue-icon"><%= issue.icon %></div>
+            <h3><%= issue.title %></h3>
+            <p><%= issue.description %></p>
+          </a>
+        <% }) %>
+      </div>
+    </div>
+
+    <% if (selectedIssue) { %>
+      <section class="issue-steps-card">
+        <span class="eyebrow">Step-by-step guidance</span>
+        <h2><%= selectedIssue.title %></h2>
+        <p><%= selectedIssue.description %></p>
+        <ol>
+          <li>Review the product setting or file area related to this issue.</li>
+          <li>Note the exact message, screen, or behavior without sharing account secrets.</li>
+          <li>Try the basic app restart, refresh, or update check when relevant.</li>
+          <li>Submit a ticket or start chat if the issue remains unclear.</li>
+        </ol>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="/request?product=<%= product.slug %>">Submit Ticket</a>
+          <a class="btn btn-outline" href="/chat?product=<%= product.slug %>">Send Message</a>
+        </div>
+      </section>
+    <% } %>
+
+    <section class="help-articles" id="articles">
+      <span class="eyebrow">Help Articles</span>
+      <h2><%= product.name %> guidance topics</h2>
+      <div class="article-list">
+        <% product.categories.slice(0, 4).forEach(function(issue) { %>
+          <a href="/product/<%= product.slug %>/issue/<%= issue.slug %>">
+            <strong><%= issue.title %></strong>
+            <span><%= issue.description %></span>
+          </a>
+        <% }) %>
+      </div>
+    </section>
+
+    <section class="help-articles" id="faq">
+      <span class="eyebrow">FAQ</span>
+      <h2>Before you submit</h2>
+      <p>Do not include passwords, one-time codes, recovery codes, payment card data, remote access details, or Microsoft account credentials in any request or chat message.</p>
+    </section>
+  </section>
+
+  <aside class="product-sidebar">
+    <div class="need-help-card">
+      <div class="product-logo small-logo <%= product.iconClass %>" aria-hidden="true">
+        <span><%= product.iconText %></span>
+      </div>
+      <h2>Need Help Now?</h2>
+      <strong>REQUEST REVIEW</strong>
+      <p>Send your product question to this independent information and request portal.</p>
+      <a href="/chat?product=<%= product.slug %>" class="btn-danger full">Send Message</a>
+      <small>Independent request intake, not affiliated with Microsoft Corporation</small>
+    </div>
+
+    <div class="quick-links-card">
+      <h2>Quick Links</h2>
+      <% product.quickLinks.forEach(function(link) { %>
+        <% const quickHref = link === 'All Products' ? '/products' : link === 'Request Chat' ? `/chat?product=${product.slug}` : `/request?product=${product.slug}`; %>
+        <a href="<%= quickHref %>"><%= link %></a>
+      <% }) %>
+    </div>
+
+    <div class="disclaimer-card">
+      <%= disclaimer %>
+    </div>
+  </aside>
+</main>
+
+<a class="floating-chat-btn" href="/chat?product=<%= product.slug %>">Send Message</a>
