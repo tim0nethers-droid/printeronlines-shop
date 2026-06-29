@@ -315,6 +315,9 @@ function renderAdminPage(req, res, next, view, locals = {}) {
 
 function requireAdmin(req, res, next) {
   if (req.session && req.session.isAdmin) return next();
+  if (req.path.startsWith('/admin/api')) {
+    return res.status(401).json({ error: 'Admin session expired. Please log in again.' });
+  }
   return res.redirect('/admin/login');
 }
 

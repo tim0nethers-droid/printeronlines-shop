@@ -5,7 +5,9 @@
     counts: {},
     lastMessageIds: {},
     pollHandle: null,
-    audioContext: null
+    audioContext: null,
+    lastError: '',
+    sessionExpired: false
   };
 
   function $(id) {
@@ -17,7 +19,24 @@
     if (!box) return;
     box.textContent = message || '';
     box.hidden = !message;
-    if (message && window.showToast) window.showToast(message, 'error');
+    if (message && message !== state.lastError && window.showToast) window.showToast(message, 'error');
+    state.lastError = message || '';
+  }
+
+  function handleFetchError(response, fallbackMessage) {
+    if (response.status === 401 || response.redirected) {
+      state.sessionExpired = true;
+      if (state.pollHandle) window.clearInterval(state.pollHandle);
+      showError('Admin session expired. Please log in again.');
+      window.setTimeout(function () {
+        window.location.href = '/admin/login';
+      }, 1200);
+      throw new Error('session-expired');
+    }
+    if (response.status === 429) {
+      throw new Error('Too many requests. Please wait a moment, then refresh.');
+    }
+    throw new Error(fallbackMessage);
   }
 
   function beep() {
@@ -160,28 +179,30 @@
   }
 
   function loadConversation() {
-    if (!state.selectedId) return;
+    if (!state.selectedId || state.sessionExpired) return;
     fetch('/admin/api/chats/' + encodeURIComponent(state.selectedId))
       .then(function (response) {
-        if (!response.ok) throw new Error('Chat not found');
+        if (!response.ok || response.redirected) handleFetchError(response, 'Chat not found');
         return response.json();
       })
       .then(function (payload) {
         renderConversation(payload.chat);
       })
-      .catch(function () {
-        showError('Unable to load conversation.');
+      .catch(function (error) {
+        if (error.message !== 'session-expired') showError(error.message || 'Unable to load conversation.');
       });
   }
 
   function pollChats() {
+    if (state.sessionExpired) return;
     var filter = $('liveProductFilter') ? $('liveProductFilter').value : '';
     fetch('/admin/api/chats?product=' + encodeURIComponent(filter))
       .then(function (response) {
-        if (!response.ok) throw new Error('Unable to load chats');
+        if (!response.ok || response.redirected) handleFetchError(response, 'Unable to load chats');
         return response.json();
       })
       .then(function (payload) {
+        showError('');
         var chats = payload.chats || [];
         if (!state.selectedId && chats.length) state.selectedId = chats[0].id;
         if (state.selectedId && !chats.some(function (chat) { return chat.id === state.selectedId; })) {
@@ -190,8 +211,8 @@
         renderVisitorList(chats);
         if (state.selectedId) loadConversation();
       })
-      .catch(function () {
-        showError('Unable to refresh chat list.');
+      .catch(function (error) {
+        if (error.message !== 'session-expired') showError(error.message || 'Unable to refresh chat list.');
       });
   }
 
@@ -203,7 +224,7 @@
       body: JSON.stringify({ status: status })
     })
       .then(function (response) {
-        if (!response.ok) throw new Error('Unable to update status');
+        if (!response.ok || response.redirected) handleFetchError(response, 'Unable to update status');
         return response.json();
       })
       .then(function (payload) {
@@ -211,8 +232,8 @@
         pollChats();
         if (window.showToast) window.showToast('Chat status updated successfully.', 'success');
       })
-      .catch(function () {
-        showError('Unable to update chat status.');
+      .catch(function (error) {
+        if (error.message !== 'session-expired') showError(error.message || 'Unable to update chat status.');
       });
   }
 
@@ -247,8 +268,9 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ message: message })
-        })
+          })
           .then(function (response) {
+            if (response.status === 401 || response.redirected) handleFetchError(response, 'Admin session expired. Please log in again.');
             return response.json().then(function (payload) {
               if (!response.ok) throw payload;
               return payload;
