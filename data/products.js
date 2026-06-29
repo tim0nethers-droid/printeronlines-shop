@@ -3,10 +3,23 @@ function issue(title, icon, description, slug) {
 }
 
 function product(data) {
+  const pageTitle = (data.pageTitle || `${data.name} Help Guide`).replace('Information Guide', 'Help Guide');
+  const defaultCategories = (data.categories || []).slice(0, 4).map((item) => item.title.toLowerCase()).join(', ');
   return {
+    ...data,
     subtitle: 'Independent resource - not affiliated with Microsoft Corporation',
-    quickLinks: ['Common Issues', 'Setup Guidance', 'Submit Request', 'Request Chat', 'All Products'],
-    ...data
+    quickLinks: data.quickLinks || ['Common Issues', 'Setup Guidance', 'Submit Request', 'Request Chat', 'All Products'],
+    pageTitle,
+    seo: {
+      title: `${pageTitle} | Independent Product Help Portal`,
+      description: `Independent ${data.name} guide for ${defaultCategories || 'setup questions'} and service request guidance. Not affiliated with Microsoft Corporation.`,
+      keywords: [
+        `${data.name} help guide`,
+        `${data.name} setup guidance`,
+        `${data.name} service request`,
+        `${data.name} troubleshooting guide`
+      ]
+    }
   };
 }
 
@@ -480,5 +493,37 @@ const products = [
     quickLinks: ['Call Quality', 'Messaging Issue', 'Audio/Video Settings', 'Submit Request', 'Request Chat']
   })
 ];
+
+const seoOverrides = {
+  excel: {
+    title: 'Microsoft Excel Help Guide | Independent Product Help Portal',
+    description: 'Find independent guidance for Microsoft Excel formulas, workbook setup, charts, file opening issues, and spreadsheet questions. Not affiliated with Microsoft Corporation.',
+    keywords: ['Microsoft Excel guide', 'Excel formula help', 'Excel file opening issue', 'Excel chart help', 'Excel workbook setup']
+  },
+  word: {
+    title: 'Microsoft Word Help Guide | Independent Product Help Portal',
+    description: 'Independent Microsoft Word guide for document formatting, templates, printing, file opening, collaboration, and PDF export questions.',
+    keywords: ['Microsoft Word guide', 'Word document formatting guide', 'Word template question', 'Word file opening problem', 'Word PDF export']
+  },
+  windows: {
+    title: 'Windows Help Guide | Independent Product Help Portal',
+    description: 'Independent Windows guide for installation, updates, activation questions, device settings, drivers, and performance guidance.',
+    keywords: ['Windows help guide', 'Windows update guidance', 'Windows activation question guide', 'Windows driver guidance', 'Windows performance guidance']
+  },
+  'windows-11': {
+    title: 'Windows 11 Help Guide | Independent Product Help Portal',
+    description: 'Find independent Windows 11 guidance for upgrade questions, updates, activation, Start menu, Wi-Fi, and performance issues.',
+    keywords: ['Windows 11 help guide', 'Windows 11 upgrade guidance', 'Windows 11 update issue', 'Windows 11 activation question', 'Windows 11 performance issue']
+  },
+  outlook: {
+    title: 'Microsoft Outlook Help Guide | Independent Product Help Portal',
+    description: 'Independent Outlook help guide for email setup, send/receive issues, calendar questions, app configuration, and sign-in guidance.',
+    keywords: ['Microsoft Outlook help guide', 'Outlook setup guide', 'Outlook send receive issue', 'Outlook calendar issue', 'Outlook app configuration']
+  }
+};
+
+products.forEach((item) => {
+  if (seoOverrides[item.slug]) item.seo = seoOverrides[item.slug];
+});
 
 module.exports = products;

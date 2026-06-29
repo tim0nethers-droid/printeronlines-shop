@@ -63,8 +63,15 @@
       Or select your issue below for step-by-step guidance.
     </div>
 
+    <section class="help-articles product-intro">
+      <span class="eyebrow">Product Help Guide</span>
+      <h2><%= product.name %> help guide overview</h2>
+      <p>This independent guide provides general information for <%= product.name %> questions such as <%= product.categories.slice(0, 5).map(categoryTitle).join(', ').toLowerCase() %>, and safe service request preparation.</p>
+      <p><%= disclaimer %></p>
+    </section>
+
     <div class="troubleshooter-card" id="troubleshooter">
-      <h2>What are you having trouble with?</h2>
+      <h2><%= product.name %> Troubleshooter</h2>
       <p>Select your issue for step-by-step solutions.</p>
 
       <div class="issue-grid">
@@ -98,7 +105,7 @@
 
     <section class="help-articles" id="articles">
       <span class="eyebrow">Help Articles</span>
-      <h2><%= product.name %> guidance topics</h2>
+      <h2>Common <%= product.name %> Questions</h2>
       <div class="article-list">
         <% product.categories.slice(0, 4).forEach(function(issue) { %>
           <a href="/product/<%= product.slug %>/issue/<%= issue.slug %>">
@@ -109,11 +116,50 @@
       </div>
     </section>
 
+    <section class="help-articles">
+      <span class="eyebrow">Setup Guidance</span>
+      <h2><%= product.name %> setup guidance</h2>
+      <p>Review the product area, device settings, app version, and visible error message before submitting a request. Please describe the issue without sharing passwords, one-time codes, recovery codes, payment card data, or account credentials.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="/request?product=<%= product.slug %>">Submit a <%= product.name %> Service Request</a>
+        <a class="btn btn-outline" href="/chat?product=<%= product.slug %>">Start Live Chat</a>
+      </div>
+    </section>
+
     <section class="help-articles" id="faq">
       <span class="eyebrow">FAQ</span>
-      <h2>Before you submit</h2>
-      <p>Do not include passwords, one-time codes, recovery codes, payment card data, remote access details, or Microsoft account credentials in any request or chat message.</p>
+      <h2><%= product.name %> FAQs</h2>
+      <div class="article-list">
+        <article>
+          <strong>Can I submit a <%= product.name %> question here?</strong>
+          <span>Yes. You can send a general service request with your name, phone, email, selected product, issue category, and message.</span>
+        </article>
+        <article>
+          <strong>Should I include passwords or codes?</strong>
+          <span>No. Do not include passwords, one-time codes, recovery codes, payment details, remote access information, or account credentials.</span>
+        </article>
+        <article>
+          <strong>Is this an official Microsoft website?</strong>
+          <span>No. <%= disclaimer %></span>
+        </article>
+      </div>
     </section>
+
+    <% if (relatedProducts && relatedProducts.length) { %>
+      <section class="help-articles">
+        <span class="eyebrow">Related Products</span>
+        <h2>Related Microsoft product guides</h2>
+        <div class="article-list">
+          <% relatedProducts.forEach(function(related) { %>
+            <a href="/product/<%= related.slug %>">
+              <strong><%= related.name %></strong>
+              <span><%= related.description %></span>
+            </a>
+          <% }) %>
+        </div>
+      </section>
+    <% } %>
+  </section>
   </section>
 
   <aside class="product-sidebar">
@@ -134,6 +180,7 @@
         <% const quickHref = link === 'All Products' ? '/products' : link === 'Request Chat' ? `/chat?product=${product.slug}` : `/request?product=${product.slug}`; %>
         <a href="<%= quickHref %>"><%= link %></a>
       <% }) %>
+      <a href="/faq">FAQ</a>
     </div>
 
     <div class="disclaimer-card">

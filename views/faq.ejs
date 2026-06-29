@@ -1,0 +1,28 @@
+<section class="page-hero compact">
+  <div>
+    <span class="eyebrow">FAQ</span>
+    <h1>Product Help Portal FAQ</h1>
+    <p>Common questions about this independent Microsoft product information, service request, and live chat intake portal.</p>
+    <p class="disclaimer-note"><%= disclaimer %></p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="article-list">
+    <% faqs.forEach((faq) => { %>
+      <article>
+        <h2><%= faq.question %></h2>
+        <p><%= faq.answer %></p>
+      </article>
+    <% }) %>
+  </div>
+</section>
+
+<section class="band">
+  <div>
+    <span class="eyebrow">Product guides</span>
+    <h2>Browse independent product help guides</h2>
+    <p>Choose a product guide, review common questions, or submit a basic service request.</p>
+  </div>
+  <a class="button primary" href="/products">View products</a>
+</section>

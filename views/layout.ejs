@@ -3,11 +3,25 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Independent Microsoft product information and service request portal.">
-  <title><%= pageTitle %></title>
+  <title><%= seoTitle || "Product Help Portal | Independent Microsoft Product Guides" %></title>
+  <meta name="description" content="<%= seoDescription || "Independent product help guides, service requests, and live chat for Microsoft products. Not affiliated with Microsoft Corporation." %>">
+  <meta name="keywords" content="<%= seoKeywords || "Microsoft product guide, Windows guide, Excel guide, Word guide, Outlook guide" %>">
+  <link rel="canonical" href="<%= canonicalUrl %>">
+  <meta property="og:title" content="<%= seoTitle || pageTitle %>">
+  <meta property="og:description" content="<%= seoDescription %>">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="<%= canonicalUrl %>">
+  <meta property="og:site_name" content="Product Help Portal">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="<%= seoTitle || pageTitle %>">
+  <meta name="twitter:description" content="<%= seoDescription %>">
+  <meta name="robots" content="<%= robots || 'index, follow' %>">
   <link rel="stylesheet" href="/css/style.css?v=20260629-ads-compliance">
   <% if (currentPath.startsWith('/admin')) { %>
     <link rel="stylesheet" href="/css/admin.css?v=20260629-saas-dashboard">
+  <% } %>
+  <% if (jsonLd) { %>
+    <script type="application/ld+json"><%- jsonLd %></script>
   <% } %>
 </head>
 <body>
@@ -41,11 +55,22 @@
           <p><%= disclaimer %></p>
         </div>
         <nav aria-label="Footer navigation">
-          <a href="/privacy">Privacy Policy</a>
+          <strong>Popular Products</strong>
+          <a href="/product/excel">Microsoft Excel</a>
+          <a href="/product/word">Microsoft Word</a>
+          <a href="/product/powerpoint">Microsoft PowerPoint</a>
+          <a href="/product/outlook">Microsoft Outlook</a>
+          <a href="/product/windows">Windows</a>
+          <a href="/product/windows-11">Windows 11</a>
+          <a href="/product/onedrive">OneDrive</a>
+          <a href="/product/teams">Teams</a>
+          <strong>Legal</strong>
+          <a href="/privacy-policy">Privacy Policy</a>
           <a href="/terms">Terms</a>
           <a href="/disclaimer">Disclaimer</a>
           <a href="/ad-transparency">Ad Transparency</a>
           <a href="/contact">Contact</a>
+          <a href="/faq">FAQ</a>
           <% if (isAdmin) { %>
             <a href="/admin/dashboard">Admin</a>
           <% } else { %>

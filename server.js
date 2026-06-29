@@ -5,6 +5,7 @@ const fs = require('fs/promises');
 const path = require('path');
 const express = require('express');
 const helmet = require('helmet');
+const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 const session = require('express-session');
 const products = require('./data/products');
@@ -16,6 +17,7 @@ const TICKETS_FILE = path.join(DATA_DIR, 'tickets.json');
 const CHATS_FILE = path.join(DATA_DIR, 'chats.json');
 const VISITS_FILE = path.join(DATA_DIR, 'visits.json');
 const DISCLAIMER = 'This is an independent service request and information portal. We are not affiliated with Microsoft Corporation.';
+const SITE_URL = (process.env.SITE_URL || 'https://printeronlines.shop').replace(/\/+$/, '');
 const ADMIN_USER = process.env.ADMIN_USER || 'admin';
 const ADMIN_PASS = process.env.ADMIN_PASS || 'admin@123';
 const SESSION_SECRET = process.env.SESSION_SECRET || 'local-development-secret-change-me';
@@ -35,17 +37,9 @@ app.set('trust proxy', 1);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
+app.use(compression());
 app.use(helmet({
-  contentSecurityPolicy: {
-    useDefaults: true,
-    directives: {
-      "script-src": ["'self'"],
-      "style-src": ["'self'"],
-      "img-src": ["'self'", 'data:'],
-      "connect-src": ["'self'"],
-      "form-action": ["'self'"]
-    }
-  }
+  contentSecurityPolicy: false
 }));
 
 app.use(rateLimit({
@@ -178,6 +172,51 @@ function categorySlug(category) {
   return typeof category === 'string' ? cleanSlug(category) : category.slug;
 }
 
+function absoluteUrl(pathname = '/') {
+  const pathPart = pathname.startsWith('/') ? pathname : `/${pathname}`;
+  return `${SITE_URL}${pathPart}`;
+}
+
+function xmlEscape(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+function safeJsonLd(data) {
+  return JSON.stringify(data).replace(/</g, '\\u003c');
+}
+
+function seoForProduct(product) {
+  return product.seo || {
+    title: `${product.pageTitle || `${product.name} Help Guide`} | Independent Product Help Portal`,
+    description: `Independent ${product.name} guide for ${product.categories.slice(0, 4).map(categoryTitle).join(', ').toLowerCase()} and service request guidance. Not affiliated with Microsoft Corporation.`,
+    keywords: [`${product.name} help guide`, `${product.name} setup guidance`, `${product.name} service request`]
+  };
+}
+
+function relatedProductsFor(product) {
+  const relatedMap = {
+    excel: ['word', 'powerpoint', 'microsoft-365', 'onedrive'],
+    word: ['excel', 'powerpoint', 'microsoft-365', 'onedrive'],
+    powerpoint: ['excel', 'word', 'microsoft-365', 'teams'],
+    outlook: ['microsoft-365', 'teams', 'onedrive', 'microsoft-edge'],
+    windows: ['windows-11', 'windows-10', 'windows-update', 'windows-security', 'microsoft-edge'],
+    'windows-11': ['windows', 'windows-update', 'windows-security', 'microsoft-edge'],
+    'windows-10': ['windows', 'windows-update', 'windows-security', 'windows-defender'],
+    'windows-update': ['windows', 'windows-11', 'windows-10', 'windows-security'],
+    'windows-security': ['windows', 'windows-defender', 'windows-update', 'microsoft-edge']
+  };
+  const slugs = relatedMap[product.slug] || products
+    .filter((item) => item.slug !== product.slug)
+    .slice(0, 4)
+    .map((item) => item.slug);
+  return slugs.map((slug) => productBySlug.get(slug)).filter(Boolean);
+}
+
 function categoriesFor(product) {
   return product
     ? product.categories.map(categoryTitle)
@@ -278,15 +317,29 @@ function asyncRoute(handler) {
 }
 
 function baseLocals(req, extra = {}) {
+  const defaultTitle = 'Product Help Portal | Independent Microsoft Product Guides';
+  const defaultDescription = 'Independent product help guides, service requests, and live chat for Microsoft products. Not affiliated with Microsoft Corporation.';
+  const defaultKeywords = 'Microsoft product guide, Windows guide, Excel guide, Word guide, Outlook guide, service request portal';
+  const canonicalPath = req.path === '/' ? '/' : req.path.replace(/\/+$/, '');
+  const seoTitle = extra.seoTitle || extra.pageTitle || defaultTitle;
+  const seoDescription = extra.seoDescription || defaultDescription;
+  const keywordValue = Array.isArray(extra.seoKeywords) ? extra.seoKeywords.join(', ') : (extra.seoKeywords || defaultKeywords);
   return {
     products,
     disclaimer: DISCLAIMER,
+    siteUrl: SITE_URL,
     currentPath: req.path,
     isAdmin: Boolean(req.session && req.session.isAdmin),
     categoryTitle,
     categorySlug,
+    seoTitle,
+    seoDescription,
+    seoKeywords: keywordValue,
+    canonicalUrl: extra.canonicalUrl || absoluteUrl(canonicalPath || '/'),
+    robots: extra.robots || (req.path.startsWith('/admin') ? 'noindex, nofollow' : 'index, follow'),
+    jsonLd: extra.jsonLd || null,
     guidePage: false,
-    pageTitle: 'Microsoft Product Information & Service Request Portal',
+    pageTitle: seoTitle,
     ...extra
   };
 }
@@ -355,7 +408,11 @@ app.use((req, res, next) => {
 
 app.get('/', (req, res, next) => {
   renderPage(req, res, next, 'index', {
-    pageTitle: 'Microsoft Product Information & Service Request Portal',
+    pageTitle: 'Product Help Portal | Independent Microsoft Product Guides',
+    seoTitle: 'Product Help Portal | Independent Microsoft Product Guides',
+    seoDescription: 'Independent Microsoft product information portal with Windows, Excel, Word, Outlook, OneDrive, Teams, setup guidance, service requests, and live chat intake.',
+    seoKeywords: 'Microsoft product information portal, Windows help guide, Excel help guide, Word guide, Outlook setup guide, service request portal',
+    canonicalUrl: absoluteUrl('/'),
     popularProducts: products.slice(0, 6),
     featuredProducts: products
   });
@@ -363,7 +420,11 @@ app.get('/', (req, res, next) => {
 
 app.get('/products', (req, res, next) => {
   renderPage(req, res, next, 'products', {
-    pageTitle: 'Products',
+    pageTitle: 'Microsoft Product Guides | Independent Product Help Portal',
+    seoTitle: 'Microsoft Product Guides | Independent Product Help Portal',
+    seoDescription: 'Browse independent Microsoft product help guides for Windows, Excel, Word, PowerPoint, Outlook, OneDrive, Teams, Microsoft 365, Edge, Xbox, Surface, Azure, and more.',
+    seoKeywords: 'Microsoft product guides, Windows guide, Excel guide, Outlook setup guide, OneDrive sync guidance, Teams meeting guidance',
+    canonicalUrl: absoluteUrl('/products'),
     productList: products
   });
 });
@@ -378,6 +439,7 @@ app.get('/product/:slug', (req, res, next) => {
   const canonicalSlug = slugAliases.get(rawSlug) || rawSlug;
   if (canonicalSlug !== rawSlug) return res.redirect(301, `/product/${canonicalSlug}`);
   const product = productBySlug.get(canonicalSlug);
+  const productSeo = product ? seoForProduct(product) : null;
   if (!product) return renderPage(req, res.status(404), next, 'legal', {
     pageTitle: 'Product Not Found',
     heading: 'Product not found',
@@ -389,9 +451,30 @@ app.get('/product/:slug', (req, res, next) => {
     ]
   });
   return renderPage(req, res, next, 'product-detail', {
-    pageTitle: product.pageTitle || `${product.name} Information Guide`,
+    pageTitle: productSeo.title,
+    seoTitle: productSeo.title,
+    seoDescription: productSeo.description,
+    seoKeywords: productSeo.keywords,
+    canonicalUrl: absoluteUrl(`/product/${product.slug}`),
     product,
+    relatedProducts: relatedProductsFor(product),
     selectedIssue: null,
+    jsonLd: safeJsonLd({
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: product.pageTitle,
+      description: productSeo.description,
+      url: absoluteUrl(`/product/${product.slug}`),
+      isPartOf: {
+        '@type': 'WebSite',
+        name: 'Product Help Portal',
+        url: SITE_URL
+      },
+      about: {
+        '@type': 'Thing',
+        name: product.name
+      }
+    }),
     guidePage: true,
     formValues: {
       product: product.slug,
@@ -409,10 +492,32 @@ app.get('/product/:slug/issue/:issueSlug', (req, res, next) => {
   if (!product) return res.redirect('/products');
   const issueSlug = cleanSlug(req.params.issueSlug);
   const selectedIssue = product.categories.find((item) => categorySlug(item) === issueSlug);
+  const productSeo = seoForProduct(product);
   return renderPage(req, res, next, 'product-detail', {
-    pageTitle: selectedIssue ? `${selectedIssue.title} - ${product.name}` : product.pageTitle,
+    pageTitle: selectedIssue ? `${selectedIssue.title} - ${product.name} | Independent Product Help Portal` : productSeo.title,
+    seoTitle: selectedIssue ? `${selectedIssue.title} - ${product.name} | Independent Product Help Portal` : productSeo.title,
+    seoDescription: selectedIssue ? `${selectedIssue.description} Independent guidance for ${product.name}. Not affiliated with Microsoft Corporation.` : productSeo.description,
+    seoKeywords: productSeo.keywords,
+    canonicalUrl: absoluteUrl(`/product/${product.slug}/issue/${issueSlug}`),
     product,
+    relatedProducts: relatedProductsFor(product),
     selectedIssue,
+    jsonLd: safeJsonLd({
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: selectedIssue ? `${selectedIssue.title} - ${product.name}` : product.pageTitle,
+      description: selectedIssue ? selectedIssue.description : productSeo.description,
+      url: absoluteUrl(`/product/${product.slug}/issue/${issueSlug}`),
+      isPartOf: {
+        '@type': 'WebSite',
+        name: 'Product Help Portal',
+        url: SITE_URL
+      },
+      about: {
+        '@type': 'Thing',
+        name: product.name
+      }
+    }),
     guidePage: true,
     formValues: {
       product: product.slug,
@@ -425,7 +530,12 @@ app.get('/product/:slug/issue/:issueSlug', (req, res, next) => {
 app.get('/request', (req, res, next) => {
   const selectedProduct = selectedProductFrom(req.query.product);
   renderPage(req, res, next, 'request', {
-    pageTitle: 'Start Service Request',
+    pageTitle: 'Start Service Request | Product Help Portal',
+    seoTitle: 'Start Service Request | Product Help Portal',
+    seoDescription: 'Submit a basic independent Microsoft product service request with name, phone, email, product, issue category, and message only.',
+    seoKeywords: 'Microsoft product service request, product setup guidance, independent request portal',
+    canonicalUrl: absoluteUrl('/request'),
+    robots: 'noindex, follow',
     selectedProduct,
     formValues: {
       name: '',
@@ -497,7 +607,12 @@ app.get('/success', asyncRoute(async (req, res, next) => {
 app.get('/chat', (req, res, next) => {
   const selectedProduct = selectedProductFrom(req.query.product);
   renderPage(req, res, next, 'chat', {
-    pageTitle: 'Message Intake',
+    pageTitle: 'Message Intake | Product Help Portal',
+    seoTitle: 'Message Intake | Product Help Portal',
+    seoDescription: 'Send a basic product question to an independent Microsoft product information portal. Do not submit passwords, codes, payment data, or credentials.',
+    seoKeywords: 'product message intake, Microsoft product question, independent product portal',
+    canonicalUrl: absoluteUrl('/chat'),
+    robots: 'noindex, follow',
     guidePage: true,
     selectedProduct,
     formValues: {
@@ -830,9 +945,16 @@ app.get('/admin/reports/export', requireAdmin, asyncRoute(async (req, res) => {
   return res.send(JSON.stringify(data, null, 2));
 }));
 
-app.get('/privacy', (req, res, next) => {
+app.get('/privacy', (req, res) => {
+  res.redirect(301, '/privacy-policy');
+});
+
+app.get('/privacy-policy', (req, res, next) => {
   renderPage(req, res, next, 'legal', {
     pageTitle: 'Privacy Policy',
+    seoTitle: 'Privacy Policy | Product Help Portal',
+    seoDescription: 'Privacy policy for the independent Product Help Portal, including information collected through product requests and chat messages.',
+    canonicalUrl: absoluteUrl('/privacy-policy'),
     heading: 'Privacy Policy',
     sections: [
       {
@@ -858,6 +980,9 @@ app.get('/privacy', (req, res, next) => {
 app.get('/terms', (req, res, next) => {
   renderPage(req, res, next, 'legal', {
     pageTitle: 'Terms',
+    seoTitle: 'Terms | Product Help Portal',
+    seoDescription: 'Terms for using the independent Product Help Portal for Microsoft product information guides and service request intake.',
+    canonicalUrl: absoluteUrl('/terms'),
     heading: 'Terms',
     sections: [
       {
@@ -883,6 +1008,9 @@ app.get('/terms', (req, res, next) => {
 app.get('/disclaimer', (req, res, next) => {
   renderPage(req, res, next, 'legal', {
     pageTitle: 'Disclaimer',
+    seoTitle: 'Disclaimer | Product Help Portal',
+    seoDescription: 'Disclaimer for the independent Product Help Portal. This website is not affiliated with Microsoft Corporation.',
+    canonicalUrl: absoluteUrl('/disclaimer'),
     heading: 'Disclaimer',
     sections: [
       {
@@ -904,6 +1032,9 @@ app.get('/disclaimer', (req, res, next) => {
 app.get('/ad-transparency', (req, res, next) => {
   renderPage(req, res, next, 'legal', {
     pageTitle: 'Advertising Transparency',
+    seoTitle: 'Advertising Transparency | Product Help Portal',
+    seoDescription: 'Advertising transparency and safe request boundaries for the independent Product Help Portal.',
+    canonicalUrl: absoluteUrl('/ad-transparency'),
     heading: 'Advertising Transparency',
     sections: [
       {
@@ -929,6 +1060,9 @@ app.get('/ad-transparency', (req, res, next) => {
 app.get('/contact', (req, res, next) => {
   renderPage(req, res, next, 'legal', {
     pageTitle: 'Contact',
+    seoTitle: 'Contact | Product Help Portal',
+    seoDescription: 'Contact the independent Product Help Portal by starting a product request or live chat intake.',
+    canonicalUrl: absoluteUrl('/contact'),
     heading: 'Contact',
     sections: [
       {
@@ -941,6 +1075,72 @@ app.get('/contact', (req, res, next) => {
       }
     ]
   });
+});
+
+app.get('/faq', (req, res, next) => {
+  const faqs = [
+    {
+      question: 'Is Product Help Portal affiliated with Microsoft Corporation?',
+      answer: DISCLAIMER
+    },
+    {
+      question: 'What information can I submit in a service request?',
+      answer: 'The request form asks only for name, phone, email, selected product, issue category, and message.'
+    },
+    {
+      question: 'Should I include passwords, one-time codes, or payment details?',
+      answer: 'No. Do not submit passwords, one-time codes, recovery codes, payment card data, remote access details, or Microsoft account credentials.'
+    },
+    {
+      question: 'Which product guides are available?',
+      answer: 'The portal includes independent guides for Windows, Windows 11, Excel, Word, PowerPoint, Outlook, OneDrive, Teams, Microsoft 365, Edge, Xbox, Surface, Azure, and related products.'
+    }
+  ];
+  renderPage(req, res, next, 'faq', {
+    pageTitle: 'FAQ | Independent Product Help Portal',
+    seoTitle: 'FAQ | Independent Product Help Portal',
+    seoDescription: 'Frequently asked questions about the independent Microsoft product help guide, service request, and live chat intake portal.',
+    seoKeywords: 'Microsoft product guide FAQ, independent product help portal, service request FAQ',
+    canonicalUrl: absoluteUrl('/faq'),
+    faqs,
+    jsonLd: safeJsonLd({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faqs.map((faq) => ({
+        '@type': 'Question',
+        name: faq.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: faq.answer
+        }
+      }))
+    })
+  });
+});
+
+app.get('/sitemap.xml', (req, res) => {
+  const urls = [
+    { loc: absoluteUrl('/'), priority: '1.0' },
+    { loc: absoluteUrl('/products'), priority: '0.9' },
+    ...products.map((product) => ({
+      loc: absoluteUrl(`/product/${product.slug}`),
+      priority: '0.8'
+    })),
+    { loc: absoluteUrl('/faq'), priority: '0.6' },
+    { loc: absoluteUrl('/contact'), priority: '0.6' },
+    { loc: absoluteUrl('/privacy-policy'), priority: '0.4' },
+    { loc: absoluteUrl('/terms'), priority: '0.4' },
+    { loc: absoluteUrl('/disclaimer'), priority: '0.4' }
+  ];
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((url) => `  <url>\n    <loc>${xmlEscape(url.loc)}</loc>\n    <changefreq>weekly</changefreq>\n    <priority>${url.priority}</priority>\n  </url>`).join('\n')}\n</urlset>`;
+  res.type('application/xml');
+  res.send(xml);
+});
+
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain');
+  res.send(`User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /api/\nDisallow: /chat\nDisallow: /request\n\nSitemap: ${absoluteUrl('/sitemap.xml')}\n`);
 });
 
 app.use((req, res, next) => {
