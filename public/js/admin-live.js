@@ -3,7 +3,9 @@
     selectedId: new URLSearchParams(window.location.search).get('session') || '',
     initialized: false,
     counts: {},
-    pollHandle: null
+    lastMessageIds: {},
+    pollHandle: null,
+    audioContext: null
   };
 
   function $(id) {
@@ -21,15 +23,36 @@
   function beep() {
     var AudioContext = window.AudioContext || window.webkitAudioContext;
     if (!AudioContext) return;
-    var context = new AudioContext();
+    var context = state.audioContext || new AudioContext();
+    state.audioContext = context;
+    if (context.state === 'suspended') {
+      context.resume().catch(function () {});
+    }
     var oscillator = context.createOscillator();
     var gain = context.createGain();
-    oscillator.frequency.value = 760;
-    gain.gain.value = 0.06;
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(720, context.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(980, context.currentTime + 0.12);
+    gain.gain.setValueAtTime(0.001, context.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.08, context.currentTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.22);
     oscillator.connect(gain);
     gain.connect(context.destination);
     oscillator.start();
-    oscillator.stop(context.currentTime + 0.12);
+    oscillator.stop(context.currentTime + 0.24);
+  }
+
+  function isSoundEnabled() {
+    var toggle = $('soundToggle');
+    return !!(toggle && toggle.checked);
+  }
+
+  function shouldNotify(chat, previousCount) {
+    if (!state.initialized || !isSoundEnabled()) return false;
+    if (chat.messageCount <= previousCount) return false;
+    if (!chat.lastMessage) return true;
+    if (chat.lastMessage.id && state.lastMessageIds[chat.id] === chat.lastMessage.id) return false;
+    return chat.lastMessage.sender !== 'admin';
   }
 
   function renderVisitorList(chats) {
@@ -46,10 +69,12 @@
 
     chats.forEach(function (chat) {
       var previousCount = state.counts[chat.id] || 0;
-      if (state.initialized && chat.messageCount > previousCount && $('soundToggle') && $('soundToggle').checked) {
+      if (shouldNotify(chat, previousCount)) {
         beep();
+        if (window.showToast) window.showToast('New live chat message received.', 'info');
       }
       state.counts[chat.id] = chat.messageCount;
+      if (chat.lastMessage && chat.lastMessage.id) state.lastMessageIds[chat.id] = chat.lastMessage.id;
 
       var button = document.createElement('button');
       button.type = 'button';
@@ -194,6 +219,21 @@
   document.addEventListener('DOMContentLoaded', function () {
     var replyForm = $('adminReplyForm');
     var productFilter = $('liveProductFilter');
+    var soundToggle = $('soundToggle');
+
+    if (soundToggle) {
+      var savedSound = window.localStorage.getItem('adminLiveSound');
+      soundToggle.checked = savedSound === null ? true : savedSound === 'true';
+      soundToggle.addEventListener('change', function () {
+        window.localStorage.setItem('adminLiveSound', soundToggle.checked ? 'true' : 'false');
+        if (soundToggle.checked) {
+          beep();
+          if (window.showToast) window.showToast('New chat sound enabled.', 'success');
+        } else if (window.showToast) {
+          window.showToast('New chat sound disabled.', 'info');
+        }
+      });
+    }
 
     if (replyForm) {
       replyForm.addEventListener('submit', function (event) {
