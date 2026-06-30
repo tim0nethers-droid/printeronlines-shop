@@ -1919,6 +1919,284 @@ small {
   }
 }
 
+/* ===== Final Mobile Chat Overrides ===== */
+
+@media (max-width: 980px) {
+  .guide-header {
+    align-items: flex-start !important;
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+    padding: 12px 18px !important;
+  }
+
+  .guide-brand {
+    flex: 1 1 240px !important;
+  }
+
+  .guide-nav {
+    order: 3 !important;
+    width: 100% !important;
+    justify-content: flex-start !important;
+    gap: 6px !important;
+    overflow-x: auto !important;
+    padding-bottom: 2px !important;
+  }
+
+  .guide-nav a {
+    flex: 0 0 auto !important;
+    white-space: nowrap !important;
+  }
+
+  .chat-card.chat-session-active {
+    max-width: 100% !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .guide-header {
+    padding: 10px 12px !important;
+  }
+
+  .guide-brand,
+  .guide-actions {
+    width: 100% !important;
+  }
+
+  .guide-actions {
+    justify-content: space-between !important;
+  }
+
+  .guide-actions select {
+    flex: 0 0 74px !important;
+  }
+
+  .guide-actions a {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    padding-inline: 9px !important;
+    text-align: center !important;
+  }
+
+  .chat-page {
+    padding: 10px 8px 30px !important;
+  }
+
+  .chat-card {
+    max-width: 100% !important;
+    padding: 16px 12px !important;
+    border-radius: 14px !important;
+  }
+
+  .chat-card h1 {
+    font-size: clamp(25px, 8vw, 32px) !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .chat-messages {
+    height: min(52vh, 420px) !important;
+    min-height: 270px !important;
+    padding: 10px !important;
+  }
+
+  .chat-message {
+    max-width: 92% !important;
+    font-size: 13px !important;
+  }
+
+  .chat-reply-form {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .chat-reply-form {
+    grid-template-columns: 1fr !important;
+  }
+
+  .chat-reply-form button {
+    width: 100% !important;
+  }
+}
+
+/* ===== Responsive Chat / Guide Header Fix ===== */
+
+@media (max-width: 980px) {
+  .guide-header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px 18px;
+  }
+
+  .guide-brand {
+    flex: 1 1 240px;
+  }
+
+  .guide-nav {
+    order: 3;
+    width: 100%;
+    justify-content: flex-start;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: thin;
+  }
+
+  .guide-nav a {
+    flex: 0 0 auto;
+    padding: 8px 9px;
+    white-space: nowrap;
+  }
+
+  .guide-actions {
+    flex: 0 1 auto;
+    justify-content: flex-end;
+  }
+
+  .chat-page {
+    min-height: auto;
+    padding: 14px 14px 40px;
+  }
+
+  .chat-card.chat-session-active {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .guide-header {
+    padding: 10px 12px;
+  }
+
+  .guide-brand {
+    flex: 1 1 100%;
+  }
+
+  .guide-actions {
+    width: 100%;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .guide-actions select {
+    flex: 0 0 74px;
+  }
+
+  .guide-actions a {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding-inline: 9px;
+    text-align: center;
+  }
+
+  .chat-page {
+    padding: 10px 8px 30px;
+  }
+
+  .chat-card {
+    max-width: 100% !important;
+    padding: 16px 12px;
+    border-radius: 14px;
+  }
+
+  .chat-card h1 {
+    font-size: clamp(25px, 8vw, 32px);
+    overflow-wrap: anywhere;
+  }
+
+  .chat-subtitle,
+  .chat-disclaimer-small,
+  .chat-footer-disclaimer {
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .chat-start-form input,
+  .chat-start-form select,
+  .chat-start-form textarea {
+    min-height: 42px;
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .chat-window-header {
+    align-items: flex-start;
+    padding: 12px;
+  }
+
+  .chat-window-header.compact h2 {
+    font-size: 16px;
+    overflow-wrap: anywhere;
+  }
+
+  .status-pill {
+    flex: 0 0 auto;
+  }
+
+  .chat-messages {
+    height: min(52vh, 420px);
+    min-height: 270px;
+    padding: 10px;
+  }
+
+  .chat-message {
+    max-width: 92%;
+    font-size: 13px;
+  }
+
+  .chat-message p {
+    padding: 9px 10px;
+  }
+
+  .chat-reply-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .chat-reply-form input {
+    min-width: 0;
+  }
+
+  .chat-reply-form button {
+    padding-inline: 12px;
+  }
+}
+
+@media (max-width: 420px) {
+  .brand-mark {
+    width: 38px;
+    height: 38px;
+  }
+
+  .guide-brand strong {
+    font-size: 15px;
+  }
+
+  .guide-actions a,
+  .guide-actions select {
+    font-size: 13px;
+  }
+
+  .chat-card {
+    padding: 14px 10px;
+  }
+
+  .chat-product-logo {
+    transform: scale(0.9);
+  }
+
+  .chat-reply-form {
+    grid-template-columns: 1fr;
+  }
+
+  .chat-reply-form button {
+    width: 100%;
+  }
+}
+
 /* ===== Real-time Live Chat Polish ===== */
 
 .chat-typing,
