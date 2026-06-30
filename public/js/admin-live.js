@@ -9,6 +9,8 @@
     initialized: false,
     pollHandle: null,
     typingTimer: null,
+    ringTimer: null,
+    ringStopTimer: null,
     audioContext: null,
     sessionExpired: false
   };
@@ -39,24 +41,52 @@
     throw new Error(fallbackMessage);
   }
 
-  function beep() {
+  function playRing(durationMs) {
+    var ringDuration = durationMs || 10000;
     var AudioContext = window.AudioContext || window.webkitAudioContext;
     if (!AudioContext) return;
     var context = state.audioContext || new AudioContext();
     state.audioContext = context;
     if (context.state === 'suspended') context.resume().catch(function () {});
-    var oscillator = context.createOscillator();
-    var gain = context.createGain();
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(720, context.currentTime);
-    oscillator.frequency.exponentialRampToValueAtTime(980, context.currentTime + 0.12);
-    gain.gain.setValueAtTime(0.001, context.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.08, context.currentTime + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.22);
-    oscillator.connect(gain);
-    gain.connect(context.destination);
-    oscillator.start();
-    oscillator.stop(context.currentTime + 0.24);
+
+    stopRing();
+
+    function playPulse() {
+      var first = context.createOscillator();
+      var second = context.createOscillator();
+      var gain = context.createGain();
+      first.type = 'sine';
+      second.type = 'sine';
+      first.frequency.setValueAtTime(760, context.currentTime);
+      first.frequency.exponentialRampToValueAtTime(940, context.currentTime + 0.14);
+      second.frequency.setValueAtTime(540, context.currentTime);
+      second.frequency.exponentialRampToValueAtTime(620, context.currentTime + 0.14);
+      gain.gain.setValueAtTime(0.001, context.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.09, context.currentTime + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.48);
+      first.connect(gain);
+      second.connect(gain);
+      gain.connect(context.destination);
+      first.start();
+      second.start(context.currentTime + 0.08);
+      first.stop(context.currentTime + 0.5);
+      second.stop(context.currentTime + 0.5);
+    }
+
+    playPulse();
+    state.ringTimer = window.setInterval(playPulse, 850);
+    state.ringStopTimer = window.setTimeout(stopRing, ringDuration);
+  }
+
+  function stopRing() {
+    if (state.ringTimer) {
+      window.clearInterval(state.ringTimer);
+      state.ringTimer = null;
+    }
+    if (state.ringStopTimer) {
+      window.clearTimeout(state.ringStopTimer);
+      state.ringStopTimer = null;
+    }
   }
 
   function isSoundEnabled() {
@@ -459,7 +489,7 @@
     });
 
     state.socket.on('admin:notify', function (payload) {
-      if (isSoundEnabled()) beep();
+      if (isSoundEnabled()) playRing(10000);
       if (window.showToast) {
         window.showToast('New message from ' + ((payload && payload.name) || 'visitor') + '.', 'info');
       }
@@ -499,9 +529,10 @@
       soundToggle.addEventListener('change', function () {
         window.localStorage.setItem('adminLiveSound', soundToggle.checked ? 'true' : 'false');
         if (soundToggle.checked) {
-          beep();
+          playRing(900);
           if (window.showToast) window.showToast('New chat sound enabled.', 'success');
         } else if (window.showToast) {
+          stopRing();
           window.showToast('New chat sound disabled.', 'info');
         }
       });
