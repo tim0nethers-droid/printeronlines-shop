@@ -62,19 +62,19 @@
       second.frequency.setValueAtTime(540, context.currentTime);
       second.frequency.exponentialRampToValueAtTime(620, context.currentTime + 0.14);
       gain.gain.setValueAtTime(0.001, context.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.09, context.currentTime + 0.03);
-      gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.48);
+      gain.gain.exponentialRampToValueAtTime(0.22, context.currentTime + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.58);
       first.connect(gain);
       second.connect(gain);
       gain.connect(context.destination);
       first.start();
       second.start(context.currentTime + 0.08);
-      first.stop(context.currentTime + 0.5);
-      second.stop(context.currentTime + 0.5);
+      first.stop(context.currentTime + 0.6);
+      second.stop(context.currentTime + 0.6);
     }
 
     playPulse();
-    state.ringTimer = window.setInterval(playPulse, 850);
+    state.ringTimer = window.setInterval(playPulse, 720);
     state.ringStopTimer = window.setTimeout(stopRing, ringDuration);
   }
 
