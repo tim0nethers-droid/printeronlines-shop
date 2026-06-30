@@ -101,10 +101,12 @@
 
   function setupFooterDropdowns() {
     var toggles = Array.prototype.slice.call(document.querySelectorAll('.footer-toggle'));
+    var mobileQuery = window.matchMedia('(max-width: 560px)');
     toggles.forEach(function (toggle) {
       var column = toggle.closest('.footer-col');
       if (!column) return;
-      column.classList.add('footer-open');
+      column.classList.toggle('footer-open', !mobileQuery.matches);
+      toggle.setAttribute('aria-expanded', mobileQuery.matches ? 'false' : 'true');
       toggle.addEventListener('click', function () {
         var isOpen = column.classList.toggle('footer-open');
         toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
