@@ -12,9 +12,11 @@
 <body class="admin-page" data-toast="<%= toast || '' %>">
   <div class="toast-container"></div>
   <%- body %>
-  <script src="/js/admin.js?v=20260629-saas-dashboard"></script>
-  <% if (currentPath.startsWith('/admin/live')) { %>
+  <% if (currentPath.startsWith('/admin/dashboard') || currentPath.startsWith('/admin/live')) { %>
     <script src="/socket.io/socket.io.js"></script>
+  <% } %>
+  <script src="/js/admin.js?v=20260630-dashboard-ring"></script>
+  <% if (currentPath.startsWith('/admin/live')) { %>
     <script src="/js/admin-live.js?v=20260630-ring-extra-loud"></script>
   <% } %>
 </body>
