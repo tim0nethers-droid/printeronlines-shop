@@ -112,11 +112,44 @@
     });
   }
 
+  function setupMobileMenus() {
+    var headers = Array.prototype.slice.call(document.querySelectorAll('.site-header, .guide-header'));
+    headers.forEach(function (header) {
+      var toggle = header.querySelector('.mobile-menu-toggle');
+      var panel = header.querySelector('.mobile-menu-panel');
+      if (!toggle || !panel) return;
+
+      function setOpen(open) {
+        header.classList.toggle('mobile-menu-open', open);
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      }
+
+      toggle.addEventListener('click', function (event) {
+        event.preventDefault();
+        setOpen(!header.classList.contains('mobile-menu-open'));
+      });
+
+      panel.addEventListener('click', function (event) {
+        if (event.target.closest('a')) setOpen(false);
+      });
+
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') setOpen(false);
+      });
+
+      document.addEventListener('click', function (event) {
+        if (header.contains(event.target)) return;
+        setOpen(false);
+      });
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     filterProducts();
     syncCategorySelects();
     enableClickableCards();
     setupHeaderDropdowns();
     setupFooterDropdowns();
+    setupMobileMenus();
   });
 })();

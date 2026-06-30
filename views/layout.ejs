@@ -23,7 +23,7 @@
     gtag('js', new Date());
     gtag('config', 'AW-18203994396');
   </script>
-  <link rel="stylesheet" href="/css/style.css?v=20260630-header-footer-dropdowns">
+  <link rel="stylesheet" href="/css/style.css?v=20260630-mobile-drawer-menu">
   <% if (currentPath.startsWith('/admin')) { %>
     <link rel="stylesheet" href="/css/admin.css?v=20260629-saas-dashboard">
   <% } %>
@@ -42,26 +42,31 @@
           <small>Independent requests</small>
         </span>
       </a>
-      <nav class="main-nav" aria-label="Main navigation">
-        <a class="<%= currentPath === '/' ? 'active' : '' %>" href="/">Home</a>
-        <div class="nav-dropdown">
-          <button class="nav-dropdown-toggle <%= currentPath.startsWith('/products') || currentPath.startsWith('/product') ? 'active' : '' %>" type="button" aria-expanded="false">
-            Products
-          </button>
-          <div class="nav-dropdown-menu">
-            <a href="/products">All Products</a>
-            <a href="/product/microsoft">Microsoft</a>
-            <a href="/product/windows">Windows</a>
-            <a href="/product/excel">Microsoft Excel</a>
-            <a href="/product/word">Microsoft Word</a>
-            <a href="/product/outlook">Microsoft Outlook</a>
-            <a href="/product/onedrive">OneDrive</a>
-            <a href="/product/teams">Teams</a>
+      <button class="mobile-menu-toggle" type="button" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="mobile-menu-panel">
+        <nav class="main-nav" aria-label="Main navigation">
+          <a class="<%= currentPath === '/' ? 'active' : '' %>" href="/">Home</a>
+          <div class="nav-dropdown">
+            <button class="nav-dropdown-toggle <%= currentPath.startsWith('/products') || currentPath.startsWith('/product') ? 'active' : '' %>" type="button" aria-expanded="false">
+              Products
+            </button>
+            <div class="nav-dropdown-menu">
+              <a href="/products">All Products</a>
+              <a href="/product/microsoft">Microsoft</a>
+              <a href="/product/windows">Windows</a>
+              <a href="/product/excel">Microsoft Excel</a>
+              <a href="/product/word">Microsoft Word</a>
+              <a href="/product/outlook">Microsoft Outlook</a>
+              <a href="/product/onedrive">OneDrive</a>
+              <a href="/product/teams">Teams</a>
+            </div>
           </div>
-        </div>
-        <a class="<%= currentPath.startsWith('/request') ? 'active' : '' %>" href="/request">Request</a>
-        <a class="<%= currentPath.startsWith('/chat') ? 'active' : '' %>" href="/chat">Chat</a>
-      </nav>
+          <a class="<%= currentPath.startsWith('/request') ? 'active' : '' %>" href="/request">Request</a>
+          <a class="<%= currentPath.startsWith('/chat') ? 'active' : '' %>" href="/chat">Chat</a>
+        </nav>
+      </div>
     </header>
     <% } %>
 
@@ -132,7 +137,7 @@
       </div>
     </footer>
   </div>
-  <script src="/js/main.js?v=20260630-header-footer-dropdowns"></script>
+  <script src="/js/main.js?v=20260630-mobile-drawer-menu"></script>
   <% if (currentPath.startsWith('/admin')) { %>
     <script src="/js/admin.js?v=20260629-saas-dashboard"></script>
   <% } %>
