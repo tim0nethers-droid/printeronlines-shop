@@ -103,7 +103,7 @@
             var chatWindow = $('chatWindow');
             if (chatWindow) chatWindow.hidden = false;
             var title = $('chatTitle');
-            if (title && payload.chat) title.textContent = payload.chat.product + ' product question';
+            if (title && payload.chat) title.textContent = payload.chat.product + ' chat request';
             renderMessages(payload.chat.messages || []);
             startPolling();
           })

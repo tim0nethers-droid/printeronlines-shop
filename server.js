@@ -606,22 +606,14 @@ app.get('/success', asyncRoute(async (req, res, next) => {
 
 app.get('/chat', (req, res, next) => {
   const selectedProduct = selectedProductFrom(req.query.product);
-  const isMicrosoftGuideLanding = selectedProduct.slug === 'microsoft';
-  const guideSlugs = ['windows', 'excel', 'word', 'outlook', 'onedrive', 'teams', 'microsoft-365', 'microsoft-edge'];
   renderPage(req, res, next, 'chat', {
-    pageTitle: isMicrosoftGuideLanding ? 'Microsoft Product Help Guide' : 'Message Intake | Product Help Portal',
-    seoTitle: isMicrosoftGuideLanding ? 'Microsoft Product Help Guide | Independent Information Portal' : 'Message Intake | Product Help Portal',
-    seoDescription: isMicrosoftGuideLanding
-      ? 'Independent Microsoft product guide for Windows, Excel, Word, Outlook, OneDrive, Teams, and Microsoft 365. Not affiliated with Microsoft Corporation.'
-      : 'Send a basic product question to an independent Microsoft product information portal. Do not submit passwords, codes, payment data, or credentials.',
-    seoKeywords: isMicrosoftGuideLanding
-      ? 'Microsoft product help guide, Windows guide, Excel guide, Word guide, Outlook guide, OneDrive guidance, Teams guidance, Microsoft 365 guide'
-      : 'product message intake, Microsoft product question, independent product portal',
-    canonicalUrl: isMicrosoftGuideLanding ? absoluteUrl('/chat?product=microsoft') : absoluteUrl('/chat'),
-    robots: isMicrosoftGuideLanding ? 'index, follow' : 'noindex, follow',
+    pageTitle: 'Message Intake | Product Help Portal',
+    seoTitle: 'Message Intake | Product Help Portal',
+    seoDescription: 'Send a basic product question to an independent Microsoft product information portal. Do not submit passwords, codes, payment data, or credentials.',
+    seoKeywords: 'product message intake, Microsoft product question, independent product portal',
+    canonicalUrl: absoluteUrl('/chat'),
+    robots: 'noindex, follow',
     guidePage: true,
-    isMicrosoftGuideLanding,
-    guideProducts: guideSlugs.map((slug) => productBySlug.get(slug)).filter(Boolean),
     selectedProduct,
     formValues: {
       name: '',
