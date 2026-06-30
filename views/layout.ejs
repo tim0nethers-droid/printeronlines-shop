@@ -56,34 +56,65 @@
     </main>
 
     <footer class="site-footer">
-      <div class="footer-grid">
-        <div>
-          <strong>Product Request Portal</strong>
+      <div class="footer-inner">
+        <div class="footer-col footer-brand">
+          <div class="footer-logo-row">
+            <div class="footer-logo">MP</div>
+            <div>
+              <strong>Product Help Portal</strong>
+              <span>Independent requests</span>
+            </div>
+          </div>
           <p><%= disclaimer %></p>
         </div>
-        <nav aria-label="Footer navigation">
-          <strong>Popular Products</strong>
-          <a href="/product/excel">Microsoft Excel</a>
-          <a href="/product/word">Microsoft Word</a>
-          <a href="/product/powerpoint">Microsoft PowerPoint</a>
-          <a href="/product/outlook">Microsoft Outlook</a>
-          <a href="/product/windows">Windows</a>
-          <a href="/product/windows-11">Windows 11</a>
-          <a href="/product/onedrive">OneDrive</a>
-          <a href="/product/teams">Teams</a>
-          <strong>Legal</strong>
-          <a href="/privacy-policy">Privacy Policy</a>
-          <a href="/terms">Terms</a>
-          <a href="/disclaimer">Disclaimer</a>
-          <a href="/ad-transparency">Ad Transparency</a>
-          <a href="/contact">Contact</a>
-          <a href="/faq">FAQ</a>
-          <% if (isAdmin) { %>
-            <a href="/admin/dashboard">Admin</a>
-          <% } else { %>
-            <a href="/admin/login">Admin Login</a>
-          <% } %>
-        </nav>
+
+        <div class="footer-col">
+          <h3>Popular Products</h3>
+          <ul>
+            <li><a href="/product/excel">Microsoft Excel</a></li>
+            <li><a href="/product/word">Microsoft Word</a></li>
+            <li><a href="/product/powerpoint">Microsoft PowerPoint</a></li>
+            <li><a href="/product/outlook">Microsoft Outlook</a></li>
+            <li><a href="/product/windows">Windows</a></li>
+            <li><a href="/product/windows-11">Windows 11</a></li>
+            <li><a href="/product/onedrive">OneDrive</a></li>
+            <li><a href="/product/teams">Teams</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h3>Guides</h3>
+          <ul>
+            <li><a href="/product/microsoft-365">Microsoft 365</a></li>
+            <li><a href="/product/windows-update">Windows Update</a></li>
+            <li><a href="/product/microsoft-edge">Microsoft Edge</a></li>
+            <li><a href="/product/onenote">OneNote</a></li>
+            <li><a href="/product/sharepoint">SharePoint</a></li>
+            <li><a href="/product/power-bi">Power BI</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h3>Legal</h3>
+          <ul>
+            <li><a href="/privacy-policy">Privacy Policy</a></li>
+            <li><a href="/terms">Terms</a></li>
+            <li><a href="/disclaimer">Disclaimer</a></li>
+            <li><a href="/ad-transparency">Ad Transparency</a></li>
+            <li><a href="/contact">Contact</a></li>
+            <li><a href="/faq">FAQ</a></li>
+            <% if (isAdmin) { %>
+              <li><a href="/admin/dashboard">Admin</a></li>
+            <% } else { %>
+              <li><a href="/admin/login">Admin Login</a></li>
+            <% } %>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>&copy; <%= new Date().getFullYear() %> Product Help Portal. All rights reserved.</span>
+        <span>Independent information portal. Not affiliated with Microsoft Corporation.</span>
       </div>
     </footer>
   </div>
