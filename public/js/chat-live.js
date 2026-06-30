@@ -1,9 +1,19 @@
 (function () {
   var storagePrefix = 'php_chat_';
+  var pageProduct = String(window.CHAT_PAGE_PRODUCT || '').trim();
+  var storedProduct = window.localStorage.getItem(storagePrefix + 'product') || '';
+  var storedSession = window.localStorage.getItem(storagePrefix + 'session_id') || '';
+  if (pageProduct && storedSession && (!storedProduct || storedProduct !== pageProduct)) {
+    window.localStorage.removeItem(storagePrefix + 'session_id');
+    window.localStorage.removeItem(storagePrefix + 'token');
+    window.localStorage.removeItem(storagePrefix + 'customer_name');
+    window.localStorage.setItem(storagePrefix + 'product', pageProduct);
+  }
   var state = {
     socket: null,
     chatId: window.localStorage.getItem(storagePrefix + 'session_id') || '',
     token: window.localStorage.getItem(storagePrefix + 'token') || '',
+    pageProduct: pageProduct,
     lastRendered: '',
     pollHandle: null,
     typingTimer: null,
@@ -41,7 +51,10 @@
     if (state.chatId) window.localStorage.setItem(storagePrefix + 'session_id', state.chatId);
     if (state.token) window.localStorage.setItem(storagePrefix + 'token', state.token);
     if (chat.visitor && chat.visitor.name) window.localStorage.setItem(storagePrefix + 'customer_name', chat.visitor.name);
-    if (chat.productSlug) window.localStorage.setItem(storagePrefix + 'product', chat.productSlug);
+    if (chat.productSlug) {
+      state.pageProduct = chat.productSlug;
+      window.localStorage.setItem(storagePrefix + 'product', chat.productSlug);
+    }
   }
 
   function showChatWindow(chat) {
