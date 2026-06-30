@@ -56,27 +56,34 @@
     function playPulse() {
       var first = context.createOscillator();
       var second = context.createOscillator();
+      var third = context.createOscillator();
       var gain = context.createGain();
-      first.type = 'sine';
+      first.type = 'square';
       second.type = 'sine';
-      first.frequency.setValueAtTime(760, context.currentTime);
-      first.frequency.exponentialRampToValueAtTime(940, context.currentTime + 0.14);
-      second.frequency.setValueAtTime(540, context.currentTime);
-      second.frequency.exponentialRampToValueAtTime(620, context.currentTime + 0.14);
+      third.type = 'triangle';
+      first.frequency.setValueAtTime(880, context.currentTime);
+      first.frequency.exponentialRampToValueAtTime(1180, context.currentTime + 0.16);
+      second.frequency.setValueAtTime(660, context.currentTime);
+      second.frequency.exponentialRampToValueAtTime(760, context.currentTime + 0.16);
+      third.frequency.setValueAtTime(1320, context.currentTime);
+      third.frequency.exponentialRampToValueAtTime(1480, context.currentTime + 0.16);
       gain.gain.setValueAtTime(0.001, context.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.22, context.currentTime + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.48, context.currentTime + 0.03);
       gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.58);
       first.connect(gain);
       second.connect(gain);
+      third.connect(gain);
       gain.connect(context.destination);
       first.start();
       second.start(context.currentTime + 0.08);
+      third.start(context.currentTime + 0.04);
       first.stop(context.currentTime + 0.6);
       second.stop(context.currentTime + 0.6);
+      third.stop(context.currentTime + 0.6);
     }
 
     playPulse();
-    state.ringTimer = window.setInterval(playPulse, 720);
+    state.ringTimer = window.setInterval(playPulse, 580);
     state.ringStopTimer = window.setTimeout(stopRing, ringDuration);
   }
 
