@@ -13,6 +13,10 @@
   <aside class="visitor-panel">
     <div class="panel-top">
       <label>
+        Search
+        <input id="adminChatSearch" type="search" placeholder="Search name, phone, product">
+      </label>
+      <label>
         Product
         <select id="liveProductFilter">
           <option value="">All products</option>
@@ -25,6 +29,13 @@
         <input type="checkbox" id="soundToggle" checked>
         New message sound
       </label>
+      <div class="chat-list-filters" aria-label="Chat filters">
+        <button type="button" class="active" data-list-filter="all">All</button>
+        <button type="button" data-list-filter="open">Open</button>
+        <button type="button" data-list-filter="pending">Pending</button>
+        <button type="button" data-list-filter="closed">Closed</button>
+        <button type="button" data-list-filter="unread">Unread</button>
+      </div>
     </div>
     <div class="visitor-list" id="visitorList" aria-live="polite"></div>
   </aside>
@@ -41,9 +52,21 @@
     </form>
     <div class="status-controls">
       <button type="button" data-chat-status="Open">Open</button>
-      <button type="button" data-chat-status="In Progress">In Progress</button>
+      <button type="button" data-chat-status="Pending">Pending</button>
       <button type="button" data-chat-status="Closed">Closed</button>
     </div>
     <div class="form-error" id="adminLiveError" hidden></div>
   </section>
+
+  <aside class="visitor-details-panel">
+    <div id="visitorDetails" class="visitor-details-card">
+      <h2>Visitor Details</h2>
+      <p>Select a visitor conversation to view details.</p>
+    </div>
+    <div class="quick-chat-actions">
+      <button type="button" data-chat-status="Pending">Mark Pending</button>
+      <button type="button" data-chat-status="Closed">Close Chat</button>
+      <button type="button" id="exportChatButton">Export Chat</button>
+    </div>
+  </aside>
 </section>

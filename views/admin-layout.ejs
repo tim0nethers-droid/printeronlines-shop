@@ -14,7 +14,8 @@
   <%- body %>
   <script src="/js/admin.js?v=20260629-saas-dashboard"></script>
   <% if (currentPath.startsWith('/admin/live')) { %>
-    <script src="/js/admin-live.js?v=20260629-session-fix"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/admin-live.js?v=20260630-realtime-chat"></script>
   <% } %>
 </body>
 </html>

@@ -1894,6 +1894,234 @@ small {
   }
 }
 
+/* ===== Real-time Live Chat Polish ===== */
+
+.chat-typing,
+.admin-typing-indicator {
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 8px 14px;
+}
+
+.live-visitor-item {
+  border-radius: 16px;
+  position: relative;
+}
+
+.visitor-name-stack {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  text-align: left;
+}
+
+.visitor-name-stack strong {
+  color: #0f172a;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.visitor-name-stack small,
+.visitor-preview,
+.visitor-meta-line {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.visitor-preview {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.visitor-flags {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-left: auto;
+}
+
+.online-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #94a3b8;
+  box-shadow: 0 0 0 4px rgba(148, 163, 184, 0.12);
+}
+
+.online-dot.is-online {
+  background: #22c55e;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.16);
+}
+
+.unread-badge {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  color: #fff;
+  background: #ef4444;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.conversation-heading-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.conversation-heading-row h2 {
+  margin: 0;
+}
+
+.live-chat-status-line {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-live .message.visitor {
+  align-self: flex-start;
+}
+
+.admin-live .message.visitor p {
+  color: #0f172a;
+  background: #ffffff;
+  border-color: #dbe3ef;
+}
+
+.admin-live .message.admin {
+  align-self: flex-end;
+}
+
+.admin-live .message.admin span,
+.admin-live .message.admin small {
+  text-align: right;
+}
+
+.admin-live .message small {
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.admin-live .messages {
+  background:
+    linear-gradient(rgba(248, 250, 252, 0.9), rgba(248, 250, 252, 0.9)),
+    radial-gradient(circle at top right, rgba(37, 99, 235, 0.08), transparent 34%);
+}
+
+.chat-window .chat-messages {
+  scroll-behavior: smooth;
+}
+
+.safe-chat-note {
+  margin: -2px 0 14px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.admin-live {
+  grid-template-columns: 330px minmax(0, 1fr) 300px;
+}
+
+.chat-list-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chat-list-filters button,
+.quick-chat-actions button {
+  border: 1px solid #dbe3ef;
+  background: #ffffff;
+  color: #0f2a50;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.chat-list-filters button.active,
+.chat-list-filters button:hover,
+.quick-chat-actions button:hover {
+  border-color: #2563eb;
+  color: #ffffff;
+  background: #2563eb;
+}
+
+.visitor-details-panel {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+
+.visitor-details-card,
+.quick-chat-actions {
+  background: #ffffff;
+  border: 1px solid #dbe3ef;
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+}
+
+.visitor-details-card h2 {
+  margin: 0 0 12px;
+  font-size: 18px;
+}
+
+.visitor-details-card dl {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.visitor-details-card dl div {
+  min-width: 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.visitor-details-card dt {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.visitor-details-card dd {
+  margin: 3px 0 0;
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.quick-chat-actions {
+  display: grid;
+  gap: 10px;
+}
+
+@media (max-width: 1180px) {
+  .admin-live {
+    grid-template-columns: 320px minmax(0, 1fr);
+  }
+
+  .visitor-details-panel {
+    grid-column: 1 / -1;
+  }
+}
+
 .guide-header {
   min-height: 72px;
   display: flex;

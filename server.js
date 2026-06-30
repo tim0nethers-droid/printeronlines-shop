@@ -3,14 +3,23 @@ require('dotenv').config();
 const crypto = require('crypto');
 const fs = require('fs/promises');
 const path = require('path');
+const http = require('http');
 const express = require('express');
 const helmet = require('helmet');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 const session = require('express-session');
+const { Server } = require('socket.io');
 const products = require('./data/products');
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST', 'PATCH']
+  }
+});
 const PORT = process.env.PORT || 3000;
 const DATA_DIR = path.join(__dirname, 'data');
 const TICKETS_FILE = path.join(DATA_DIR, 'tickets.json');
@@ -21,7 +30,7 @@ const SITE_URL = (process.env.SITE_URL || 'https://printeronlines.shop').replace
 const ADMIN_USER = process.env.ADMIN_USER || 'admin';
 const ADMIN_PASS = process.env.ADMIN_PASS || 'admin@123';
 const SESSION_SECRET = process.env.SESSION_SECRET || 'local-development-secret-change-me';
-const allowedStatuses = ['New', 'Open', 'In Progress', 'Closed'];
+const allowedStatuses = ['New', 'Open', 'Pending', 'In Progress', 'Closed'];
 const productBySlug = new Map(products.map((product) => [product.slug, product]));
 const slugAliases = new Map([
   ['edge', 'microsoft-edge'],
@@ -147,6 +156,27 @@ function createMessage(sender, text) {
     text: cleanText(text, 1500),
     createdAt: new Date().toISOString()
   };
+}
+
+function messageTime(message) {
+  return message.createdAt || message.at || new Date().toISOString();
+}
+
+function messageSender(sender) {
+  return sender === 'customer' ? 'visitor' : sender;
+}
+
+function normalizeStatus(status, fallback = 'Open') {
+  const raw = cleanText(status, 40).toLowerCase();
+  const map = {
+    new: 'New',
+    open: 'Open',
+    pending: 'Pending',
+    'in-progress': 'In Progress',
+    'in progress': 'In Progress',
+    closed: 'Closed'
+  };
+  return map[raw] || fallback;
 }
 
 function selectedProductFrom(value) {
@@ -303,6 +333,217 @@ async function appendJson(file, item) {
   });
 }
 
+function normalizeChat(chat) {
+  if (!chat) return null;
+  const productMeta = selectedProductFrom(chat.productSlug || chat.product);
+  const messages = Array.isArray(chat.messages) ? chat.messages : [];
+  const lastMessage = messages[messages.length - 1] || null;
+  return {
+    ...chat,
+    id: chat.id || chat.sessionId,
+    sessionId: chat.sessionId || chat.id,
+    status: normalizeStatus(chat.status, 'Open'),
+    product: chat.product || productMeta.name,
+    productName: chat.product || productMeta.name,
+    productSlug: chat.productSlug || productMeta.slug,
+    productIconText: productMeta.iconText,
+    productIconClass: productMeta.iconClass,
+    customer: chat.customer || chat.visitor || {},
+    visitor: chat.visitor || chat.customer || {},
+    unreadAdmin: Number(chat.unreadAdmin || 0),
+    unreadCustomer: Number(chat.unreadCustomer || 0),
+    visitorOnline: Boolean(chat.visitorOnline),
+    adminOnline: Boolean(chat.adminOnline),
+    lastMessage: chat.lastMessage || (lastMessage ? lastMessage.text : ''),
+    lastMessageAt: chat.lastMessageAt || (lastMessage ? messageTime(lastMessage) : (chat.updatedAt || chat.createdAt)),
+    messages: messages.map((message) => ({
+      ...message,
+      id: message.id || crypto.randomUUID(),
+      sender: messageSender(message.sender),
+      createdAt: message.createdAt || message.at || new Date().toISOString(),
+      at: message.at || message.createdAt || new Date().toISOString(),
+      seen: Boolean(message.seen)
+    }))
+  };
+}
+
+function serializeChat(chat) {
+  const normalized = normalizeChat(chat);
+  return {
+    ...normalized,
+    id: normalized.sessionId,
+    sessionId: normalized.sessionId,
+    visitor: normalized.visitor,
+    customer: normalized.customer,
+    updatedAt: normalized.updatedAt || normalized.lastMessageAt || normalized.createdAt
+  };
+}
+
+function chatSummary(chat) {
+  const normalized = normalizeChat(chat);
+  return {
+    id: normalized.sessionId,
+    sessionId: normalized.sessionId,
+    status: normalized.status,
+    product: normalized.productName,
+    productName: normalized.productName,
+    productSlug: normalized.productSlug,
+    productIconText: normalized.productIconText,
+    productIconClass: normalized.productIconClass,
+    issueCategory: normalized.issueCategory || 'General question',
+    visitor: normalized.visitor,
+    customer: normalized.customer,
+    visitorOnline: normalized.visitorOnline,
+    adminOnline: normalized.adminOnline,
+    unreadAdmin: normalized.unreadAdmin,
+    unreadCustomer: normalized.unreadCustomer,
+    createdAt: normalized.createdAt,
+    updatedAt: normalized.updatedAt,
+    lastMessage: normalized.messages[normalized.messages.length - 1] || null,
+    lastMessageText: normalized.lastMessage,
+    lastMessageAt: normalized.lastMessageAt,
+    messageCount: normalized.messages.length
+  };
+}
+
+async function getChatList(productFilter = '') {
+  const chats = await readJson(CHATS_FILE, []);
+  const normalized = chats.map(normalizeChat).filter(Boolean);
+  const filtered = productFilter ? normalized.filter((chat) => chat.productSlug === productFilter) : normalized;
+  return filtered
+    .sort((a, b) => new Date(b.lastMessageAt || b.updatedAt || b.createdAt) - new Date(a.lastMessageAt || a.updatedAt || a.createdAt))
+    .map(chatSummary);
+}
+
+async function getChatBySession(sessionId) {
+  const chatId = cleanText(sessionId, 100);
+  const chats = await readJson(CHATS_FILE, []);
+  return normalizeChat(chats.find((chat) => chat.id === chatId || chat.sessionId === chatId));
+}
+
+async function createOrGetChatSession(data = {}) {
+  const sessionId = cleanText(data.sessionId, 100);
+  const fields = requestFields({
+    name: data.name || data.customer?.name,
+    email: data.email || data.customer?.email,
+    phone: data.phone || data.customer?.phone,
+    product: data.productSlug || data.product || 'microsoft',
+    issue: data.issue || data.issueCategory || 'General question',
+    message: data.message || 'Visitor opened the message window.'
+  });
+  const product = selectedProductFrom(fields.productSlug || 'microsoft');
+  const now = new Date().toISOString();
+  let result;
+
+  await mutateJson(CHATS_FILE, [], async (chats) => {
+    let chat = sessionId ? chats.find((item) => item.id === sessionId || item.sessionId === sessionId) : null;
+    if (!chat) {
+      const newSessionId = sessionId || createChatId();
+      chat = {
+        id: newSessionId,
+        sessionId: newSessionId,
+        token: cleanText(data.token, 100) || crypto.randomBytes(16).toString('hex'),
+        status: 'Open',
+        product: product.name,
+        productName: product.name,
+        productSlug: product.slug,
+        issueCategory: fields.issueCategory || 'General question',
+        visitor: {
+          name: fields.name || 'Visitor',
+          email: fields.email || '',
+          phone: fields.phone || '',
+          ip: cleanText(data.ip || 'unknown', 120),
+          userAgent: cleanText(data.userAgent || 'unknown', 300),
+          pagePath: cleanText(data.pagePath || '/chat', 300)
+        },
+        customer: {
+          name: fields.name || 'Visitor',
+          email: fields.email || '',
+          phone: fields.phone || ''
+        },
+        visitorOnline: true,
+        adminOnline: false,
+        unreadAdmin: 0,
+        unreadCustomer: 0,
+        lastMessage: '',
+        lastMessageAt: now,
+        messages: [],
+        createdAt: now,
+        updatedAt: now
+      };
+      chats.push(chat);
+    } else {
+      chat.visitor = {
+        ...(chat.visitor || {}),
+        name: fields.name || chat.visitor?.name || chat.customer?.name || 'Visitor',
+        email: fields.email || chat.visitor?.email || chat.customer?.email || '',
+        phone: fields.phone || chat.visitor?.phone || chat.customer?.phone || '',
+        ip: cleanText(data.ip || chat.visitor?.ip || 'unknown', 120),
+        userAgent: cleanText(data.userAgent || chat.visitor?.userAgent || 'unknown', 300),
+        pagePath: cleanText(data.pagePath || chat.visitor?.pagePath || '/chat', 300)
+      };
+      chat.customer = {
+        name: chat.visitor.name,
+        email: chat.visitor.email,
+        phone: chat.visitor.phone
+      };
+      chat.visitorOnline = true;
+      chat.updatedAt = now;
+    }
+    result = serializeChat(chat);
+  });
+
+  return result;
+}
+
+async function addChatMessage(sessionId, sender, text) {
+  const chatId = cleanText(sessionId, 100);
+  const safeText = cleanText(text, 2000);
+  if (!chatId || !safeText) return null;
+  if (hasSensitiveData(safeText)) {
+    const error = new Error('Please remove account credentials, one-time codes, recovery codes, payment card details, or device-control details.');
+    error.code = 'SENSITIVE_DATA';
+    throw error;
+  }
+  const now = new Date().toISOString();
+  const message = {
+    id: `MSG-${crypto.randomBytes(6).toString('hex').toUpperCase()}`,
+    sender: messageSender(sender),
+    text: safeText,
+    at: now,
+    createdAt: now,
+    seen: false
+  };
+  let updatedChat;
+  await mutateJson(CHATS_FILE, [], async (chats) => {
+    const chat = chats.find((item) => item.id === chatId || item.sessionId === chatId);
+    if (!chat) return;
+    chat.messages = Array.isArray(chat.messages) ? chat.messages : [];
+    chat.messages.push(message);
+    chat.lastMessage = message.text;
+    chat.lastMessageAt = now;
+    chat.updatedAt = now;
+    chat.status = chat.status === 'Closed' ? 'Open' : normalizeStatus(chat.status, 'Open');
+    chat.unreadAdmin = message.sender === 'visitor' ? Number(chat.unreadAdmin || 0) + 1 : Number(chat.unreadAdmin || 0);
+    chat.unreadCustomer = message.sender === 'admin' ? Number(chat.unreadCustomer || 0) + 1 : Number(chat.unreadCustomer || 0);
+    updatedChat = serializeChat(chat);
+  });
+  return updatedChat ? { chat: updatedChat, message } : null;
+}
+
+async function updateChatFlags(sessionId, updater) {
+  const chatId = cleanText(sessionId, 100);
+  let updatedChat;
+  await mutateJson(CHATS_FILE, [], async (chats) => {
+    const chat = chats.find((item) => item.id === chatId || item.sessionId === chatId);
+    if (!chat) return;
+    updater(chat);
+    chat.updatedAt = new Date().toISOString();
+    updatedChat = serializeChat(chat);
+  });
+  return updatedChat;
+}
+
 async function ensureDataFiles() {
   await fs.mkdir(DATA_DIR, { recursive: true });
   await Promise.all([
@@ -374,6 +615,11 @@ function requireAdmin(req, res, next) {
   return res.redirect('/admin/login');
 }
 
+function requireAdminJson(req, res, next) {
+  if (req.session && req.session.isAdmin) return next();
+  return res.status(401).json({ error: 'Admin session expired. Please log in again.' });
+}
+
 function filterByDateAndProduct(records, filters) {
   return records.filter((record) => {
     const matchesDate = !filters.date || localDateFromIso(record.createdAt || record.time) === filters.date;
@@ -405,6 +651,184 @@ app.use((req, res, next) => {
   });
   return next();
 });
+
+async function emitAdminChatList() {
+  io.to('admin').emit('chat:list:update', await getChatList());
+}
+
+io.on('connection', (socket) => {
+  socket.on('admin:join', async () => {
+    socket.join('admin');
+    socket.data.role = 'admin';
+    socket.emit('chat:list:update', await getChatList());
+  });
+
+  socket.on('customer:join', async (data = {}, callback) => {
+    try {
+      const chat = await createOrGetChatSession({
+        ...data,
+        ip: socket.handshake.headers['x-forwarded-for'] || socket.handshake.address || 'unknown',
+        userAgent: socket.handshake.headers['user-agent'] || 'unknown',
+        pagePath: data.pagePath || socket.handshake.headers.referer || '/chat'
+      });
+      socket.join(`chat:${chat.sessionId}`);
+      socket.data.sessionId = chat.sessionId;
+      socket.data.role = 'customer';
+      socket.emit('chat:init', chat);
+      if (callback) callback({ ok: true, chat });
+      io.to('admin').emit('visitor:online', { sessionId: chat.sessionId, online: true });
+      await emitAdminChatList();
+    } catch (error) {
+      if (callback) callback({ ok: false, error: 'Unable to join chat.' });
+    }
+  });
+
+  socket.on('customer:message', async ({ sessionId, text } = {}, callback) => {
+    try {
+      const result = await addChatMessage(sessionId, 'visitor', text);
+      if (!result) throw new Error('Chat not found');
+      const shouldSendBotReply = (result.chat.messages || []).length === 1;
+      const botResult = shouldSendBotReply
+        ? await addChatMessage(
+          result.chat.sessionId,
+          'bot',
+          'Thank you. Your request has been received. A portal team member will review your message shortly.'
+        )
+        : null;
+      const updatedChat = botResult?.chat || result.chat;
+      io.to(`chat:${updatedChat.sessionId}`).emit('chat:message:new', {
+        sessionId: updatedChat.sessionId,
+        message: result.message,
+        chat: updatedChat
+      });
+      io.to('admin').emit('admin:notify', {
+        sessionId: updatedChat.sessionId,
+        sound: true,
+        text: result.message.text,
+        name: updatedChat.visitor?.name || 'Visitor'
+      });
+      await emitAdminChatList();
+      if (callback) callback({ ok: true, message: result.message, chat: updatedChat });
+    } catch (error) {
+      if (callback) callback({ ok: false, error: error.message || 'Unable to send message.' });
+    }
+  });
+
+  socket.on('customer:typing', ({ sessionId, isTyping } = {}) => {
+    io.to('admin').emit('chat:typing', {
+      sessionId: cleanText(sessionId, 100),
+      sender: 'customer',
+      isTyping: Boolean(isTyping)
+    });
+  });
+
+  socket.on('customer:seen', async ({ sessionId } = {}) => {
+    const chat = await updateChatFlags(sessionId, (item) => {
+      item.unreadCustomer = 0;
+      if (Array.isArray(item.messages)) {
+        item.messages.forEach((message) => {
+          if (message.sender === 'admin') message.seen = true;
+        });
+      }
+    });
+    if (chat) {
+      io.to(`chat:${chat.sessionId}`).emit('chat:seen', { sessionId: chat.sessionId, by: 'customer' });
+      await emitAdminChatList();
+    }
+  });
+
+  socket.on('admin:openChat', async ({ sessionId } = {}, callback) => {
+    const chatId = cleanText(sessionId, 100);
+    socket.join(`chat:${chatId}`);
+    socket.data.role = 'admin';
+    socket.data.sessionId = chatId;
+    const chat = await updateChatFlags(chatId, (item) => {
+      item.adminOnline = true;
+      item.unreadAdmin = 0;
+      if (Array.isArray(item.messages)) {
+        item.messages.forEach((message) => {
+          if (message.sender === 'visitor' || message.sender === 'customer') message.seen = true;
+        });
+      }
+    }) || await getChatBySession(chatId);
+    if (chat) {
+      socket.emit('chat:init', chat);
+      if (callback) callback({ ok: true, chat });
+      await emitAdminChatList();
+    } else if (callback) {
+      callback({ ok: false, error: 'Chat not found.' });
+    }
+  });
+
+  socket.on('admin:message', async ({ sessionId, text } = {}, callback) => {
+    try {
+      const result = await addChatMessage(sessionId, 'admin', text);
+      if (!result) throw new Error('Chat not found');
+      io.to(`chat:${result.chat.sessionId}`).emit('chat:message:new', {
+        sessionId: result.chat.sessionId,
+        message: result.message,
+        chat: result.chat
+      });
+      await emitAdminChatList();
+      if (callback) callback({ ok: true, message: result.message, chat: result.chat });
+    } catch (error) {
+      if (callback) callback({ ok: false, error: error.message || 'Unable to send reply.' });
+    }
+  });
+
+  socket.on('admin:typing', ({ sessionId, isTyping } = {}) => {
+    const chatId = cleanText(sessionId, 100);
+    io.to(`chat:${chatId}`).emit('chat:typing', {
+      sessionId: chatId,
+      sender: 'admin',
+      isTyping: Boolean(isTyping)
+    });
+  });
+
+  socket.on('admin:updateStatus', async ({ sessionId, status } = {}, callback) => {
+    const normalizedStatus = normalizeStatus(status, 'Open');
+    const chat = await updateChatFlags(sessionId, (item) => {
+      item.status = normalizedStatus;
+    });
+    if (chat) {
+      io.to(`chat:${chat.sessionId}`).emit('chat:status:update', {
+        sessionId: chat.sessionId,
+        status: chat.status,
+        chat
+      });
+      await emitAdminChatList();
+      if (callback) callback({ ok: true, chat });
+    } else if (callback) {
+      callback({ ok: false, error: 'Chat not found.' });
+    }
+  });
+
+  socket.on('admin:seen', async ({ sessionId } = {}) => {
+    const chat = await updateChatFlags(sessionId, (item) => {
+      item.unreadAdmin = 0;
+    });
+    if (chat) await emitAdminChatList();
+  });
+
+  socket.on('disconnect', () => {
+    if (socket.data.role === 'customer' && socket.data.sessionId) {
+      const sessionId = socket.data.sessionId;
+      windowClearCustomerOnline(sessionId);
+    }
+  });
+});
+
+function windowClearCustomerOnline(sessionId) {
+  setTimeout(async () => {
+    const chat = await updateChatFlags(sessionId, (item) => {
+      item.visitorOnline = false;
+    });
+    if (chat) {
+      io.to('admin').emit('visitor:online', { sessionId: chat.sessionId, online: false });
+      await emitAdminChatList();
+    }
+  }, 5000);
+}
 
 app.get('/', (req, res, next) => {
   renderPage(req, res, next, 'index', {
@@ -648,48 +1072,56 @@ app.post('/api/chat/start', submitLimiter, asyncRoute(async (req, res) => {
     return res.status(422).json({ errors });
   }
 
-  const chat = {
-    id: createChatId(),
-    token: crypto.randomBytes(16).toString('hex'),
-    status: 'Open',
-    product: product.name,
+  const chat = await createOrGetChatSession({
+    name: fields.name,
+    email: fields.email,
+    phone: fields.phone,
     productSlug: product.slug,
-    issueCategory: fields.issueCategory,
-    visitor: {
-      name: fields.name,
-      email: fields.email,
-      phone: fields.phone,
-      ip: clientIp(req),
-      userAgent: userAgent(req),
-      pagePath: cleanText(req.get('referer') || '/chat', 300)
-    },
-    messages: [
-      createMessage('visitor', fields.message),
-      createMessage('bot', 'Thank you. Your request has been received. A portal team member will review your message shortly.')
-    ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  };
+    issue: fields.issueCategory,
+    message: fields.message,
+    ip: clientIp(req),
+    userAgent: userAgent(req),
+    pagePath: cleanText(req.get('referer') || '/chat', 300)
+  });
+  const visitorResult = await addChatMessage(chat.sessionId, 'visitor', fields.message);
+  const botResult = await addChatMessage(
+    chat.sessionId,
+    'bot',
+    'Thank you. Your request has been received. A portal team member will review your message shortly.'
+  );
+  const updatedChat = botResult?.chat || visitorResult?.chat || chat;
 
-  await appendJson(CHATS_FILE, chat);
+  io.to('admin').emit('admin:notify', {
+    sessionId: updatedChat.sessionId,
+    sound: true,
+    text: fields.message,
+    name: fields.name || 'Visitor'
+  });
+  await emitAdminChatList();
   return res.status(201).json({
-    chatId: chat.id,
-    sessionId: chat.id,
-    token: chat.token,
-    chat
+    chatId: updatedChat.sessionId,
+    sessionId: updatedChat.sessionId,
+    token: updatedChat.token,
+    chat: updatedChat
   });
 }));
 
 app.get('/api/chat/:id/messages', asyncRoute(async (req, res) => {
   const chatId = cleanText(req.params.id, 80);
   const token = cleanText(req.query.token, 80);
-  const chats = await readJson(CHATS_FILE, []);
-  const chat = chats.find((item) => item.id === chatId && item.token === token);
-  if (!chat) return res.status(404).json({ error: 'Chat not found' });
+  const chat = await getChatBySession(chatId);
+  if (!chat || chat.token !== token) return res.status(404).json({ error: 'Chat not found' });
+  await updateChatFlags(chatId, (item) => {
+    item.visitorOnline = true;
+    item.unreadCustomer = 0;
+  });
+  if (chat) await emitAdminChatList();
   return res.json({
-    id: chat.id,
+    id: chat.sessionId,
+    sessionId: chat.sessionId,
     status: chat.status,
-    messages: chat.messages
+    messages: chat.messages,
+    chat
   });
 }));
 
@@ -699,21 +1131,91 @@ app.post('/api/chat/:id/message', submitLimiter, asyncRoute(async (req, res) => 
   const message = cleanText(req.body.message, 1500);
 
   if (!message || message.length < 2) return res.status(422).json({ error: 'Message is required.' });
-  if (hasSensitiveData(message)) {
-    return res.status(422).json({ error: 'Please remove account credentials, one-time codes, recovery codes, payment card details, or device-control details.' });
+
+  const chat = await getChatBySession(chatId);
+  if (!chat || chat.token !== token) return res.status(404).json({ error: 'Chat not found' });
+
+  try {
+    const result = await addChatMessage(chatId, 'visitor', message);
+    if (!result) return res.status(404).json({ error: 'Chat not found' });
+    io.to(`chat:${result.chat.sessionId}`).emit('chat:message:new', {
+      sessionId: result.chat.sessionId,
+      message: result.message,
+      chat: result.chat
+    });
+    io.to('admin').emit('admin:notify', {
+      sessionId: result.chat.sessionId,
+      sound: true,
+      text: result.message.text,
+      name: result.chat.visitor?.name || 'Visitor'
+    });
+    await emitAdminChatList();
+    return res.json({ chat: result.chat });
+  } catch (error) {
+    return res.status(422).json({ error: error.message || 'Unable to send message.' });
   }
+}));
 
-  let updatedChat;
-  await mutateJson(CHATS_FILE, [], async (chats) => {
-    const chat = chats.find((item) => item.id === chatId && item.token === token);
-    if (!chat) return;
-    chat.messages.push(createMessage('visitor', message));
-    chat.updatedAt = new Date().toISOString();
-    if (chat.status === 'Closed') chat.status = 'Open';
-    updatedChat = chat;
+app.get('/api/chats', requireAdminJson, asyncRoute(async (req, res) => {
+  const productFilter = cleanSlug(req.query.product || '');
+  return res.json({ chats: await getChatList(productFilter) });
+}));
+
+app.get('/api/chats/:sessionId', asyncRoute(async (req, res) => {
+  const sessionId = cleanText(req.params.sessionId, 100);
+  const token = cleanText(req.query.token, 100);
+  const chat = await getChatBySession(sessionId);
+  if (!chat) return res.status(404).json({ error: 'Chat not found' });
+  if (!(req.session && req.session.isAdmin) && chat.token !== token) {
+    return res.status(404).json({ error: 'Chat not found' });
+  }
+  return res.json({ chat });
+}));
+
+app.post('/api/chats/:sessionId/message', submitLimiter, asyncRoute(async (req, res) => {
+  const sessionId = cleanText(req.params.sessionId, 100);
+  const token = cleanText(req.body.token, 100);
+  const sender = req.session && req.session.isAdmin ? 'admin' : 'visitor';
+  const chat = await getChatBySession(sessionId);
+  if (!chat) return res.status(404).json({ error: 'Chat not found' });
+  if (sender !== 'admin' && chat.token !== token) return res.status(404).json({ error: 'Chat not found' });
+
+  try {
+    const result = await addChatMessage(sessionId, sender, req.body.message);
+    if (!result) return res.status(404).json({ error: 'Chat not found' });
+    io.to(`chat:${result.chat.sessionId}`).emit('chat:message:new', {
+      sessionId: result.chat.sessionId,
+      message: result.message,
+      chat: result.chat
+    });
+    if (sender !== 'admin') {
+      io.to('admin').emit('admin:notify', {
+        sessionId: result.chat.sessionId,
+        sound: true,
+        text: result.message.text,
+        name: result.chat.visitor?.name || 'Visitor'
+      });
+    }
+    await emitAdminChatList();
+    return res.json({ chat: result.chat, message: result.message });
+  } catch (error) {
+    return res.status(422).json({ error: error.message || 'Unable to send message.' });
+  }
+}));
+
+app.patch('/api/chats/:sessionId/status', requireAdminJson, asyncRoute(async (req, res) => {
+  const sessionId = cleanText(req.params.sessionId, 100);
+  const status = normalizeStatus(req.body.status, 'Open');
+  const updatedChat = await updateChatFlags(sessionId, (chat) => {
+    chat.status = status;
   });
-
   if (!updatedChat) return res.status(404).json({ error: 'Chat not found' });
+  io.to(`chat:${updatedChat.sessionId}`).emit('chat:status:update', {
+    sessionId: updatedChat.sessionId,
+    status: updatedChat.status,
+    chat: updatedChat
+  });
+  await emitAdminChatList();
   return res.json({ chat: updatedChat });
 }));
 
@@ -824,37 +1326,15 @@ app.get('/admin/live', requireAdmin, (req, res, next) => {
 
 app.get('/admin/api/chats', requireAdmin, asyncRoute(async (req, res) => {
   const productFilter = cleanSlug(req.query.product || '');
-  const chats = await readJson(CHATS_FILE, []);
-  const filtered = productFilter ? chats.filter((chat) => chat.productSlug === productFilter) : chats;
-  const summaries = filtered
-    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
-    .map((chat) => {
-      const productMeta = selectedProductFrom(chat.productSlug);
-      return {
-        id: chat.id,
-        status: chat.status,
-        product: chat.product,
-        productSlug: chat.productSlug,
-        productIconText: productMeta.iconText,
-        productIconClass: productMeta.iconClass,
-        issueCategory: chat.issueCategory,
-        visitor: chat.visitor,
-        createdAt: chat.createdAt,
-        updatedAt: chat.updatedAt,
-        messageCount: chat.messages.length,
-        lastMessage: chat.messages[chat.messages.length - 1] || null
-      };
-    });
-  return res.json({ chats: summaries });
+  return res.json({ chats: await getChatList(productFilter) });
 }));
 
 app.get('/admin/api/chats/:id', requireAdmin, asyncRoute(async (req, res) => {
   const chatId = cleanText(req.params.id, 80);
-  const chats = await readJson(CHATS_FILE, []);
-  const chat = chats.find((item) => item.id === chatId);
+  const chat = await getChatBySession(chatId);
   if (!chat) return res.status(404).json({ error: 'Chat not found' });
   return res.json({
-    chat: withProductMeta(chat)
+    chat
   });
 }));
 
@@ -863,18 +1343,19 @@ app.post('/admin/api/chats/:id/reply', requireAdmin, asyncRoute(async (req, res)
   const message = cleanText(req.body.message, 1500);
   if (!message || message.length < 2) return res.status(422).json({ error: 'Reply is required.' });
 
-  let updatedChat;
-  await mutateJson(CHATS_FILE, [], async (chats) => {
-    const chat = chats.find((item) => item.id === chatId);
-    if (!chat) return;
-    chat.messages.push(createMessage('admin', message));
-    chat.status = 'Open';
-    chat.updatedAt = new Date().toISOString();
-    updatedChat = chat;
-  });
-
-  if (!updatedChat) return res.status(404).json({ error: 'Chat not found' });
-  return res.json({ chat: withProductMeta(updatedChat) });
+  try {
+    const result = await addChatMessage(chatId, 'admin', message);
+    if (!result) return res.status(404).json({ error: 'Chat not found' });
+    io.to(`chat:${result.chat.sessionId}`).emit('chat:message:new', {
+      sessionId: result.chat.sessionId,
+      message: result.message,
+      chat: result.chat
+    });
+    await emitAdminChatList();
+    return res.json({ chat: result.chat });
+  } catch (error) {
+    return res.status(422).json({ error: error.message || 'Unable to send reply.' });
+  }
 }));
 
 app.post('/admin/api/chats/:id/status', requireAdmin, asyncRoute(async (req, res) => {
@@ -882,17 +1363,18 @@ app.post('/admin/api/chats/:id/status', requireAdmin, asyncRoute(async (req, res
   const status = cleanText(req.body.status, 40);
   if (!allowedStatuses.includes(status)) return res.status(400).json({ error: 'Invalid status' });
 
-  let updatedChat;
-  await mutateJson(CHATS_FILE, [], async (chats) => {
-    const chat = chats.find((item) => item.id === chatId);
-    if (!chat) return;
+  const updatedChat = await updateChatFlags(chatId, (chat) => {
     chat.status = status;
-    chat.updatedAt = new Date().toISOString();
-    updatedChat = chat;
   });
 
   if (!updatedChat) return res.status(404).json({ error: 'Chat not found' });
-  return res.json({ chat: withProductMeta(updatedChat) });
+  io.to(`chat:${updatedChat.sessionId}`).emit('chat:status:update', {
+    sessionId: updatedChat.sessionId,
+    status: updatedChat.status,
+    chat: updatedChat
+  });
+  await emitAdminChatList();
+  return res.json({ chat: updatedChat });
 }));
 
 app.get('/admin/reports', requireAdmin, asyncRoute(async (req, res, next) => {
@@ -1173,7 +1655,7 @@ app.use((error, req, res, next) => {
 
 ensureDataFiles()
   .then(() => {
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log(`Independent product help portal running on port ${PORT}`);
     });
   })
