@@ -320,7 +320,11 @@
       var row = document.createElement('div');
       row.className = 'message ' + (message.sender === 'customer' ? 'visitor' : message.sender);
       var label = document.createElement('span');
-      label.textContent = message.sender === 'admin' ? 'Admin' : message.sender === 'bot' ? 'Auto reply' : 'Visitor';
+      label.textContent = message.sender === 'admin'
+        ? 'Admin'
+        : message.sender === 'bot'
+          ? (message.senderName || 'Product Guide Assistant')
+          : 'Visitor';
       var bubble = document.createElement('p');
       bubble.textContent = message.text || '';
       var time = document.createElement('small');

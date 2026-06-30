@@ -85,7 +85,11 @@
       var row = document.createElement('div');
       row.className = 'chat-message ' + messageSenderClass(message.sender);
       var label = document.createElement('span');
-      label.textContent = message.sender === 'admin' ? 'Portal team' : message.sender === 'bot' ? 'Auto reply' : 'You';
+      label.textContent = message.sender === 'admin'
+        ? 'Portal team'
+        : message.sender === 'bot'
+          ? (message.senderName || 'Product Guide Assistant')
+          : 'You';
       var bubble = document.createElement('p');
       bubble.textContent = message.text || '';
       row.appendChild(label);

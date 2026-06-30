@@ -1226,6 +1226,7 @@ dd {
 }
 
 .chat-start-form input,
+.chat-start-form select,
 .chat-start-form textarea {
   width: 100%;
   min-height: 44px;
@@ -1250,6 +1251,7 @@ dd {
 }
 
 .chat-start-form input:focus,
+.chat-start-form select:focus,
 .chat-start-form textarea:focus {
   border-color: #2563eb;
   box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);

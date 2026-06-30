@@ -43,7 +43,6 @@
     <form id="chatStartForm" class="chat-start-form" novalidate>
       <input type="hidden" name="productSlug" value="<%= selectedProduct.slug %>">
       <input type="hidden" name="product" value="<%= selectedProduct.slug %>">
-      <input type="hidden" name="issue" value="<%= categoryTitle(selectedProduct.categories[0]) %>">
 
       <label for="chatName">Full Name</label>
       <input id="chatName" type="text" name="name" placeholder="Full Name" autocomplete="name" required>
@@ -56,6 +55,13 @@
 
       <label for="chatProductDisplay">Product</label>
       <input id="chatProductDisplay" type="text" value="<%= selectedProduct.name %>" readonly>
+
+      <label for="chatIssue">Issue</label>
+      <select id="chatIssue" name="issue" required>
+        <% (chatIssueOptions || []).forEach(function(issue) { %>
+          <option value="<%= issue %>"><%= issue %></option>
+        <% }) %>
+      </select>
 
       <label for="chatProblem">Describe Your Problem</label>
       <textarea id="chatProblem" name="message" placeholder="Please describe your issue in detail..." required></textarea>

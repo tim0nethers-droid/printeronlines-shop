@@ -202,6 +202,59 @@ function categorySlug(category) {
   return typeof category === 'string' ? cleanSlug(category) : category.slug;
 }
 
+function chatIssueOptionsFor(product) {
+  const commonWindows = [
+    'Windows freeze or not responding',
+    'Windows error message',
+    'Windows update not working',
+    'Computer running slow',
+    'App or software not opening',
+    'Internet or Wi-Fi not working',
+    'Blue screen or startup problem'
+  ];
+  const microsoftIssues = [
+    'Windows freeze or error',
+    'Windows update not working',
+    'Excel file or formula issue',
+    'Word document issue',
+    'Outlook email setup issue',
+    'OneDrive sync or storage issue',
+    'Teams meeting audio/video issue'
+  ];
+  if (product?.slug === 'microsoft') return microsoftIssues;
+  if (product?.slug === 'windows') return commonWindows;
+  return (product?.categories || []).map(categoryTitle);
+}
+
+function guideAssistantReplies(productSlug, issueCategory) {
+  const issue = cleanText(issueCategory, 160).toLowerCase();
+  const isMicrosoft = cleanSlug(productSlug) === 'microsoft';
+  const safetyReply = 'Please do not share passwords, OTPs, recovery codes, product keys, payment details, or remote access information.';
+  const microsoftMap = [
+    ['windows freeze or error', 'Your Windows freeze or error question has been received. Please share what appears on screen.'],
+    ['windows update not working', 'Your Windows update question has been received. Please tell if it is stuck or failed.'],
+    ['excel file or formula issue', 'Your Excel question has been received. Please share the file or formula issue.'],
+    ['word document issue', 'Your Word document question has been received. Please tell what is not working.'],
+    ['outlook email setup issue', 'Your Outlook setup question has been received. Please share what step is causing trouble.'],
+    ['onedrive sync or storage issue', 'Your OneDrive question has been received. Please tell if sync or storage is the issue.'],
+    ['teams meeting audio/video issue', 'Your Teams meeting question has been received. Please tell if audio, video, or joining is the issue.']
+  ];
+  const generalMap = [
+    ['windows freeze or not responding', 'Your Windows freeze question has been received. Please tell when it freezes.'],
+    ['windows error message', 'Your Windows error question has been received. Please share the error text or code.'],
+    ['windows update not working', 'Your Windows update question has been received. Please tell if it is stuck or failed.'],
+    ['computer running slow', 'Your slow performance question has been received. Please tell when it becomes slow.'],
+    ['app or software not opening', 'Your app opening question has been received. Please share the app name.'],
+    ['internet or wi-fi not working', 'Your internet or Wi-Fi question has been received. Please tell what is not working.'],
+    ['blue screen or startup problem', 'Your blue screen or startup question has been received. Please share what appears on screen.']
+  ];
+  const matched = (isMicrosoft ? microsoftMap : generalMap).find(([key]) => issue.includes(key));
+  const guideReply = matched
+    ? matched[1]
+    : 'Your product question has been received. Please share a few more details so our guide assistant can review it.';
+  return [guideReply, safetyReply];
+}
+
 function absoluteUrl(pathname = '/') {
   const pathPart = pathname.startsWith('/') ? pathname : `/${pathname}`;
   return `${SITE_URL}${pathPart}`;
@@ -496,7 +549,7 @@ async function createOrGetChatSession(data = {}) {
   return result;
 }
 
-async function addChatMessage(sessionId, sender, text) {
+async function addChatMessage(sessionId, sender, text, options = {}) {
   const chatId = cleanText(sessionId, 100);
   const safeText = cleanText(text, 2000);
   if (!chatId || !safeText) return null;
@@ -509,10 +562,11 @@ async function addChatMessage(sessionId, sender, text) {
   const message = {
     id: `MSG-${crypto.randomBytes(6).toString('hex').toUpperCase()}`,
     sender: messageSender(sender),
+    senderName: cleanText(options.senderName, 80) || undefined,
     text: safeText,
     at: now,
     createdAt: now,
-    seen: false
+    seen: options.seen === undefined ? false : Boolean(options.seen)
   };
   let updatedChat;
   await mutateJson(CHATS_FILE, [], async (chats) => {
@@ -688,14 +742,17 @@ io.on('connection', (socket) => {
       const result = await addChatMessage(sessionId, 'visitor', text);
       if (!result) throw new Error('Chat not found');
       const shouldSendBotReply = (result.chat.messages || []).length === 1;
-      const botResult = shouldSendBotReply
-        ? await addChatMessage(
-          result.chat.sessionId,
-          'bot',
-          'Thank you. Your request has been received. A portal team member will review your message shortly.'
-        )
-        : null;
-      const updatedChat = botResult?.chat || result.chat;
+      let updatedChat = result.chat;
+      if (shouldSendBotReply) {
+        const replies = guideAssistantReplies(result.chat.productSlug, result.chat.issueCategory);
+        for (const replyText of replies) {
+          const botResult = await addChatMessage(result.chat.sessionId, 'bot', replyText, {
+            senderName: 'Product Guide Assistant',
+            seen: true
+          });
+          if (botResult?.chat) updatedChat = botResult.chat;
+        }
+      }
       io.to(`chat:${updatedChat.sessionId}`).emit('chat:message:new', {
         sessionId: updatedChat.sessionId,
         message: result.message,
@@ -1039,6 +1096,7 @@ app.get('/chat', (req, res, next) => {
     robots: 'noindex, follow',
     guidePage: true,
     selectedProduct,
+    chatIssueOptions: chatIssueOptionsFor(selectedProduct),
     formValues: {
       name: '',
       phone: '',
@@ -1084,12 +1142,15 @@ app.post('/api/chat/start', submitLimiter, asyncRoute(async (req, res) => {
     pagePath: cleanText(req.get('referer') || '/chat', 300)
   });
   const visitorResult = await addChatMessage(chat.sessionId, 'visitor', fields.message);
-  const botResult = await addChatMessage(
-    chat.sessionId,
-    'bot',
-    'Thank you. Your request has been received. A portal team member will review your message shortly.'
-  );
-  const updatedChat = botResult?.chat || visitorResult?.chat || chat;
+  let updatedChat = visitorResult?.chat || chat;
+  const replies = guideAssistantReplies(product.slug, fields.issueCategory);
+  for (const replyText of replies) {
+    const botResult = await addChatMessage(chat.sessionId, 'bot', replyText, {
+      senderName: 'Product Guide Assistant',
+      seen: true
+    });
+    if (botResult?.chat) updatedChat = botResult.chat;
+  }
 
   io.to('admin').emit('admin:notify', {
     sessionId: updatedChat.sessionId,
