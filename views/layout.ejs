@@ -23,7 +23,7 @@
     gtag('js', new Date());
     gtag('config', 'AW-18203994396');
   </script>
-  <link rel="stylesheet" href="/css/style.css?v=20260630-footer-fix">
+  <link rel="stylesheet" href="/css/style.css?v=20260630-chat-only-after-send">
   <% if (currentPath.startsWith('/admin')) { %>
     <link rel="stylesheet" href="/css/admin.css?v=20260629-saas-dashboard">
   <% } %>
@@ -124,7 +124,7 @@
   <% } %>
   <% if (currentPath.startsWith('/chat')) { %>
     <script src="/socket.io/socket.io.js"></script>
-    <script src="/js/chat-live.js?v=20260630-hide-form-on-send"></script>
+    <script src="/js/chat-live.js?v=20260630-chat-only-after-send"></script>
   <% } %>
   <% if (currentPath.startsWith('/admin/live')) { %>
     <script src="/js/admin-live.js?v=20260629-live-admin"></script>

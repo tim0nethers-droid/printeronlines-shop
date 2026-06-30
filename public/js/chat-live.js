@@ -47,6 +47,8 @@
   function showChatWindow(chat) {
     var startForm = $('chatStartForm');
     var chatWindow = $('chatWindow');
+    var chatCard = document.querySelector('.chat-card');
+    if (chatCard) chatCard.classList.add('chat-session-active');
     if (startForm) startForm.hidden = true;
     if (chatWindow) chatWindow.hidden = false;
     var title = $('chatTitle');
@@ -58,6 +60,8 @@
   function showStartForm(errorMessage) {
     var startForm = $('chatStartForm');
     var chatWindow = $('chatWindow');
+    var chatCard = document.querySelector('.chat-card');
+    if (chatCard) chatCard.classList.remove('chat-session-active');
     if (startForm) startForm.hidden = false;
     if (chatWindow) chatWindow.hidden = true;
     if (errorMessage) showError($('chatStartError'), errorMessage);

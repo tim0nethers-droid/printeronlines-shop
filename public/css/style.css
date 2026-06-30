@@ -1196,6 +1196,29 @@ dd {
   gap: 8px;
 }
 
+.chat-start-form[hidden],
+.chat-window[hidden] {
+  display: none !important;
+}
+
+.chat-card.chat-session-active {
+  max-width: min(760px, 100%);
+}
+
+.chat-card.chat-session-active > .chat-product-logo,
+.chat-card.chat-session-active > h1,
+.chat-card.chat-session-active > .chat-subtitle,
+.chat-card.chat-session-active > .chat-disclaimer-small,
+.chat-card.chat-session-active > .chat-status,
+.chat-card.chat-session-active > .chat-start-form {
+  display: none !important;
+}
+
+.chat-card.chat-session-active .chat-window {
+  display: block !important;
+  margin-top: 0;
+}
+
 .chat-start-form label {
   color: #071a38;
   font-size: 15px;
