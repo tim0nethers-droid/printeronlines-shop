@@ -11,6 +11,8 @@
     typingTimer: null,
     ringTimer: null,
     ringStopTimer: null,
+    lastMessageKeys: {},
+    audioUnlocked: false,
     audioContext: null,
     sessionExpired: false
   };
@@ -78,6 +80,25 @@
     state.ringStopTimer = window.setTimeout(stopRing, ringDuration);
   }
 
+  function unlockAudio() {
+    if (state.audioUnlocked) return;
+    var AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    var context = state.audioContext || new AudioContext();
+    state.audioContext = context;
+    if (context.state === 'suspended') {
+      context.resume().catch(function () {});
+    }
+    var gain = context.createGain();
+    var oscillator = context.createOscillator();
+    gain.gain.setValueAtTime(0.0001, context.currentTime);
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+    oscillator.start();
+    oscillator.stop(context.currentTime + 0.03);
+    state.audioUnlocked = true;
+  }
+
   function stopRing() {
     if (state.ringTimer) {
       window.clearInterval(state.ringTimer);
@@ -128,6 +149,39 @@
     if (state.listFilter === 'pending') return status === 'pending';
     if (state.listFilter === 'closed') return status === 'closed';
     return true;
+  }
+
+  function chatMessageKey(chat) {
+    var last = chat.lastMessage || {};
+    return [
+      chat.sessionId || chat.id || '',
+      last.id || '',
+      last.sender || '',
+      last.text || chat.lastMessageText || '',
+      chat.lastMessageAt || chat.updatedAt || ''
+    ].join('|');
+  }
+
+  function detectNewCustomerMessages(chats) {
+    var shouldRing = false;
+    (chats || []).forEach(function (chat) {
+      var sessionId = chat.sessionId || chat.id;
+      var key = chatMessageKey(chat);
+      var last = chat.lastMessage || {};
+      var sender = last.sender || '';
+      var isCustomerMessage = sender === 'visitor' || sender === 'customer';
+      var isNew = state.lastMessageKeys[sessionId] && state.lastMessageKeys[sessionId] !== key;
+      if (state.initialized && isNew && isCustomerMessage) {
+        shouldRing = true;
+      }
+      if (!state.lastMessageKeys[sessionId] || state.lastMessageKeys[sessionId] !== key) {
+        state.lastMessageKeys[sessionId] = key;
+      }
+    });
+    if (shouldRing && isSoundEnabled()) {
+      playRing(10000);
+      if (window.showToast) window.showToast('New chat message received.', 'info');
+    }
   }
 
   function renderVisitorList(chats) {
@@ -341,6 +395,7 @@
   }
 
   function applyChatList(chats) {
+    detectNewCustomerMessages(chats || []);
     state.chats = chats || [];
     if (!state.selectedId && state.chats.length) state.selectedId = state.chats[0].sessionId || state.chats[0].id;
     if (state.selectedId && !state.chats.some(function (chat) { return (chat.sessionId || chat.id) === state.selectedId; })) {
@@ -522,6 +577,10 @@
     var input = $('adminReply');
     var searchInput = $('adminChatSearch');
     var exportButton = $('exportChatButton');
+
+    ['click', 'keydown', 'touchstart'].forEach(function (eventName) {
+      document.addEventListener(eventName, unlockAudio, { once: true, passive: true });
+    });
 
     if (soundToggle) {
       var savedSound = window.localStorage.getItem('adminLiveSound');
