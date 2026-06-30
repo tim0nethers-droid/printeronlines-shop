@@ -1919,6 +1919,126 @@ small {
   }
 }
 
+/* ===== Final Mobile Header Override ===== */
+
+@media (max-width: 900px) {
+  .site-header,
+  .guide-header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 50 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    padding: 10px 12px !important;
+  }
+
+  .brand,
+  .guide-brand {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    gap: 9px !important;
+  }
+
+  .brand-mark {
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 12px !important;
+    flex: 0 0 38px !important;
+  }
+
+  .brand strong,
+  .guide-brand strong {
+    font-size: 15px !important;
+    line-height: 1.2 !important;
+    white-space: normal !important;
+  }
+
+  .brand small,
+  .guide-brand small {
+    font-size: 11px !important;
+    line-height: 1.2 !important;
+  }
+
+  .main-nav,
+  .guide-nav {
+    order: 3 !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 6px !important;
+    overflow-x: auto !important;
+    padding: 2px 0 4px !important;
+    scrollbar-width: thin !important;
+  }
+
+  .main-nav a,
+  .guide-nav a {
+    flex: 0 0 auto !important;
+    padding: 8px 10px !important;
+    white-space: nowrap !important;
+    text-align: center !important;
+    font-size: 13px !important;
+    border-radius: 8px !important;
+  }
+
+  .guide-actions {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 6px !important;
+    justify-content: flex-end !important;
+  }
+
+  .guide-actions select,
+  .guide-actions a {
+    min-height: 34px !important;
+    padding: 7px 9px !important;
+    font-size: 12px !important;
+    white-space: nowrap !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .site-header,
+  .guide-header {
+    padding: 8px 10px !important;
+  }
+
+  .brand,
+  .guide-brand {
+    flex-basis: 100% !important;
+  }
+
+  .guide-actions {
+    order: 2 !important;
+    width: 100% !important;
+    justify-content: space-between !important;
+  }
+
+  .guide-actions select {
+    flex: 0 0 64px !important;
+  }
+
+  .guide-actions a {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .main-nav,
+  .guide-nav {
+    margin-inline: -2px !important;
+  }
+}
+
 /* ===== Final Mobile Chat Overrides ===== */
 
 @media (max-width: 980px) {
