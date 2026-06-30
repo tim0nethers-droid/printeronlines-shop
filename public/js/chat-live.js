@@ -55,6 +55,14 @@
     if (status && chat) status.textContent = chat.status || 'Open';
   }
 
+  function showStartForm(errorMessage) {
+    var startForm = $('chatStartForm');
+    var chatWindow = $('chatWindow');
+    if (startForm) startForm.hidden = false;
+    if (chatWindow) chatWindow.hidden = true;
+    if (errorMessage) showError($('chatStartError'), errorMessage);
+  }
+
   function messageSenderClass(sender) {
     return sender === 'visitor' || sender === 'customer' ? 'customer' : sender;
   }
@@ -246,12 +254,16 @@
         event.preventDefault();
         showError($('chatStartError'), '');
         var payload = formToObject(startForm);
+        showChatWindow({
+          productName: payload.productSlug || payload.product || 'Product',
+          status: 'Opening'
+        });
 
         joinSocket(payload, function (joinReply) {
           if (!joinReply || !joinReply.ok) {
             startViaRest(payload).catch(function (error) {
               var errors = error && error.errors ? Object.values(error.errors).join(' ') : 'Unable to start chat.';
-              showError($('chatStartError'), errors);
+              showStartForm(errors);
             });
             return;
           }
