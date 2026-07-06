@@ -1254,43 +1254,45 @@ dd {
   resize: vertical;
 }
 
-.chat-issue-select {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
-}
-
-.chat-issue-chips {
+.issue-chip-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin: 2px 0 4px;
+  gap: 10px;
+  margin: 10px 0 14px;
 }
 
-.chat-issue-chip {
+.issue-chip {
   border: 1px solid #d9e1ec;
   background: #ffffff;
   color: #071a38;
   border-radius: 999px;
-  padding: 8px 11px;
-  font-size: 12px;
-  line-height: 1.1;
+  padding: 9px 13px;
+  font-size: 13px;
+  line-height: 1.2;
   font-weight: 900;
   cursor: pointer;
-  box-shadow: 0 5px 14px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+  transition: 0.18s ease;
 }
 
-.chat-issue-chip:hover,
-.chat-issue-chip.active {
+.issue-chip:hover {
   border-color: #2563eb;
+  background: #f1f7ff;
+  color: #0b3b78;
+}
+
+.issue-chip.active {
+  border-color: #2563eb;
+  background: #ffffff;
   color: #0b3f91;
-  background: #eff6ff;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.chat-safety-note {
+  color: #526070;
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 6px 0 18px;
 }
 
 .chat-start-form input:focus,

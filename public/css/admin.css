@@ -564,6 +564,17 @@
   white-space: nowrap;
 }
 
+.recent-chat-item .recent-chat-issue {
+  display: inline-flex;
+  max-width: 100%;
+  padding: 3px 8px;
+  color: #1d4ed8;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  font-weight: 800;
+}
+
 .avatar {
   width: 42px;
   height: 42px;

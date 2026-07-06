@@ -208,13 +208,15 @@ function chatIssueOptionsFor(product) {
     'Windows error message',
     'Windows update not working',
     'Computer running slow',
-    'App or software not opening',
+    'Pop-up causing Windows to freeze',
     'Internet or Wi-Fi not working',
-    'Blue screen or startup problem'
+    'Blue screen after pop-up or system error'
   ];
   const microsoftIssues = [
     'Windows freeze or error',
     'Windows update not working',
+    'Pop-up causing Windows to freeze',
+    'Blue screen after pop-up or system error',
     'Excel file or formula issue',
     'Word document issue',
     'Outlook email setup issue',
@@ -233,6 +235,8 @@ function guideAssistantReplies(productSlug, issueCategory) {
   const microsoftMap = [
     ['windows freeze or error', 'Your Windows freeze or error question has been received. Please share what appears on screen.'],
     ['windows update not working', 'Your Windows update question has been received. Please tell if it is stuck or failed.'],
+    ['pop-up causing windows to freeze', 'Your pop-up and Windows freeze question has been received. Please share what appears on screen.'],
+    ['blue screen after pop-up or system error', 'Your blue screen or system error question has been received. Please share what appears on screen.'],
     ['excel file or formula issue', 'Your Excel question has been received. Please share the file or formula issue.'],
     ['word document issue', 'Your Word document question has been received. Please tell what is not working.'],
     ['outlook email setup issue', 'Your Outlook setup question has been received. Please share what step is causing trouble.'],
@@ -244,8 +248,10 @@ function guideAssistantReplies(productSlug, issueCategory) {
     ['windows error message', 'Your Windows error question has been received. Please share the error text or code.'],
     ['windows update not working', 'Your Windows update question has been received. Please tell if it is stuck or failed.'],
     ['computer running slow', 'Your slow performance question has been received. Please tell when it becomes slow.'],
+    ['pop-up causing windows to freeze', 'Your pop-up and Windows freeze question has been received. Please share what appears on screen.'],
     ['app or software not opening', 'Your app opening question has been received. Please share the app name.'],
     ['internet or wi-fi not working', 'Your internet or Wi-Fi question has been received. Please tell what is not working.'],
+    ['blue screen after pop-up or system error', 'Your blue screen or system error question has been received. Please share what appears on screen.'],
     ['blue screen or startup problem', 'Your blue screen or startup question has been received. Please share what appears on screen.']
   ];
   const matched = (isMicrosoft ? microsoftMap : generalMap).find(([key]) => issue.includes(key));
@@ -323,7 +329,7 @@ function requestFields(body) {
     phone: cleanText(body.phone, 40),
     email: cleanText(body.email, 120),
     productSlug: cleanSlug(body.product || body.productSlug),
-    issueCategory: cleanText(body.issueCategory || body.issue, 140),
+    issueCategory: cleanText(body.selectedIssue || body.issueCategory || body.issue, 140),
     message: cleanText(body.message, 1500)
   };
 }
@@ -481,7 +487,7 @@ async function createOrGetChatSession(data = {}) {
     email: data.email || data.customer?.email,
     phone: data.phone || data.customer?.phone,
     product: data.productSlug || data.product || 'microsoft',
-    issue: data.issue || data.issueCategory || 'General question',
+    issue: data.selectedIssue || data.issue || data.issueCategory || 'General product question',
     message: data.message || 'Visitor opened the message window.'
   });
   const product = selectedProductFrom(fields.productSlug || 'microsoft');

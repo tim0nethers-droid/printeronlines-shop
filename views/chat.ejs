@@ -70,23 +70,21 @@
       <label for="chatPhone">Phone Number</label>
       <input id="chatPhone" type="tel" name="phone" placeholder="Phone Number" autocomplete="tel" required>
 
-      <label class="sr-only" for="chatIssue">Issue</label>
-      <select id="chatIssue" class="chat-issue-select" name="issue" required>
-        <% (chatIssueOptions || []).forEach(function(issue) { %>
-          <option value="<%= issue %>"><%= issue %></option>
-        <% }) %>
-      </select>
+      <label for="chatProductDisplay">Product</label>
+      <input id="chatProductDisplay" type="text" value="<%= selectedProduct.name %>" readonly>
+
+      <input type="hidden" name="selectedIssue" id="selectedIssue" value="<%= (chatIssueOptions && chatIssueOptions[0]) || 'General product question' %>">
 
       <label for="chatProblem">Describe Your Problem</label>
       <textarea id="chatProblem" name="message" placeholder="Please describe your issue in detail..." required></textarea>
 
-      <div class="chat-issue-chips" aria-label="Common issues">
+      <div class="issue-chip-group" data-issue-group aria-label="Common issues">
         <% (chatIssueOptions || []).forEach(function(issue, index) { %>
-          <button class="chat-issue-chip <%= index === 0 ? 'active' : '' %>" type="button" data-issue="<%= issue %>" aria-pressed="<%= index === 0 ? 'true' : 'false' %>"><%= issue %></button>
+          <button class="issue-chip <%= index === 0 ? 'active' : '' %>" type="button" data-issue="<%= issue %>" aria-pressed="<%= index === 0 ? 'true' : 'false' %>"><%= issue %></button>
         <% }) %>
       </div>
 
-      <p class="safe-chat-note">Do not share passwords, OTPs, recovery codes, product keys, payment details, or remote access information.</p>
+      <p class="chat-safety-note">Do not share passwords, OTPs, recovery codes, product keys, payment details, or remote access information.</p>
 
       <div class="form-error" id="chatStartError" hidden></div>
       <button type="submit" class="chat-submit-btn">Start Help Chat</button>

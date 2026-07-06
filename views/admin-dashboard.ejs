@@ -213,6 +213,7 @@
                       <% } %>
                       <%= chat.product %>
                     </p>
+                    <small class="recent-chat-issue"><%= chat.issueCategory || 'General product question' %></small>
                     <small><%= lastMessage %></small>
                   </div>
                   <span class="status-badge status-<%= categorySlug(chat.status) %>"><%= chat.status %></span>

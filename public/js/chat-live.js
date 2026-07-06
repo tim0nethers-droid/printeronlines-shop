@@ -38,7 +38,8 @@
       phone: String(data.get('phone') || '').trim(),
       product: String(data.get('product') || data.get('productSlug') || '').trim(),
       productSlug: String(data.get('productSlug') || data.get('product') || '').trim(),
-      issue: String(data.get('issue') || 'General question').trim(),
+      selectedIssue: String(data.get('selectedIssue') || '').trim(),
+      issue: String(data.get('selectedIssue') || data.get('issue') || 'General product question').trim(),
       message: String(data.get('message') || '').trim(),
       pagePath: window.location.pathname + window.location.search
     };
@@ -127,9 +128,9 @@
   }
 
   function setupIssueChips() {
-    var issueSelect = $('chatIssue');
-    var chips = Array.prototype.slice.call(document.querySelectorAll('.chat-issue-chip'));
-    if (!issueSelect || !chips.length) return;
+    var issueInput = $('selectedIssue');
+    var chips = Array.prototype.slice.call(document.querySelectorAll('.issue-chip'));
+    if (!issueInput || !chips.length) return;
 
     function setActiveChip(value) {
       chips.forEach(function (chip) {
@@ -139,18 +140,15 @@
       });
     }
 
-    setActiveChip(issueSelect.value || chips[0].getAttribute('data-issue'));
+    if (!issueInput.value) issueInput.value = chips[0].getAttribute('data-issue') || 'General product question';
+    setActiveChip(issueInput.value);
 
     chips.forEach(function (chip) {
       chip.addEventListener('click', function () {
         var issue = chip.getAttribute('data-issue') || '';
-        issueSelect.value = issue;
+        issueInput.value = issue;
         setActiveChip(issue);
       });
-    });
-
-    issueSelect.addEventListener('change', function () {
-      setActiveChip(issueSelect.value);
     });
   }
 
@@ -226,7 +224,8 @@
       email: payload.email || '',
       phone: payload.phone || '',
       productSlug: payload.productSlug || payload.product || window.localStorage.getItem(storagePrefix + 'product') || 'microsoft',
-      issue: payload.issue || 'General question',
+      selectedIssue: payload.selectedIssue || payload.issue || 'General product question',
+      issue: payload.selectedIssue || payload.issue || 'General product question',
       pagePath: window.location.pathname + window.location.search
     }, callback);
   }
