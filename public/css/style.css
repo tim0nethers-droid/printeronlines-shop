@@ -1137,23 +1137,27 @@ dd {
 
 .chat-card {
   width: 100%;
-  max-width: 430px;
-  padding: 20px 20px;
+  max-width: 420px;
+  padding: 22px 18px 18px;
   background: linear-gradient(180deg, #fff7f7 0%, #ffffff 45%);
   border: 1px solid #f2caca;
-  border-radius: 18px;
+  border-radius: 8px;
   box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
 }
 
 .chat-product-logo {
   display: flex;
-  margin: 0 auto 14px;
+  margin: 0 auto 12px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  font-size: 13px;
 }
 
 .chat-card h1 {
-  margin: 0 0 8px;
+  margin: 0 0 6px;
   color: #071a38;
-  font-size: 32px;
+  font-size: 30px;
   font-weight: 900;
   line-height: 1.1;
   text-align: center;
@@ -1177,7 +1181,7 @@ dd {
   align-items: center;
   justify-content: center;
   gap: 7px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   color: #169b45;
   font-weight: 800;
 }
@@ -1193,7 +1197,7 @@ dd {
 .chat-start-form {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 7px;
 }
 
 .chat-start-form[hidden],
@@ -1221,7 +1225,7 @@ dd {
 
 .chat-start-form label {
   color: #071a38;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 900;
 }
 
@@ -1229,13 +1233,13 @@ dd {
 .chat-start-form select,
 .chat-start-form textarea {
   width: 100%;
-  min-height: 44px;
-  padding: 11px 14px;
+  min-height: 43px;
+  padding: 10px 12px;
   color: #0f172a;
   background: #fff;
   border: 1px solid #cfd8e3;
-  border-radius: 10px;
-  font-size: 15px;
+  border-radius: 5px;
+  font-size: 14px;
   outline: none;
 }
 
@@ -1246,8 +1250,47 @@ dd {
 }
 
 .chat-start-form textarea {
-  min-height: 94px;
+  min-height: 104px;
   resize: vertical;
+}
+
+.chat-issue-select {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.chat-issue-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 2px 0 4px;
+}
+
+.chat-issue-chip {
+  border: 1px solid #d9e1ec;
+  background: #ffffff;
+  color: #071a38;
+  border-radius: 999px;
+  padding: 8px 11px;
+  font-size: 12px;
+  line-height: 1.1;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 5px 14px rgba(15, 23, 42, 0.06);
+}
+
+.chat-issue-chip:hover,
+.chat-issue-chip.active {
+  border-color: #2563eb;
+  color: #0b3f91;
+  background: #eff6ff;
 }
 
 .chat-start-form input:focus,
@@ -1259,12 +1302,12 @@ dd {
 
 .chat-submit-btn {
   width: 100%;
-  margin-top: 6px;
+  margin-top: 4px;
   padding: 13px 18px;
   color: #fff;
   background: #ef3333;
   border: 0;
-  border-radius: 11px;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 16px;
   font-weight: 900;
@@ -1272,6 +1315,13 @@ dd {
 
 .chat-submit-btn:hover {
   background: #dc2626;
+}
+
+.chat-secure-note {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 12px;
+  text-align: center;
 }
 
 .chat-product-heading {

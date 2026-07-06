@@ -126,6 +126,34 @@
     box.hidden = !isTyping;
   }
 
+  function setupIssueChips() {
+    var issueSelect = $('chatIssue');
+    var chips = Array.prototype.slice.call(document.querySelectorAll('.chat-issue-chip'));
+    if (!issueSelect || !chips.length) return;
+
+    function setActiveChip(value) {
+      chips.forEach(function (chip) {
+        var active = chip.getAttribute('data-issue') === value;
+        chip.classList.toggle('active', active);
+        chip.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+    }
+
+    setActiveChip(issueSelect.value || chips[0].getAttribute('data-issue'));
+
+    chips.forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        var issue = chip.getAttribute('data-issue') || '';
+        issueSelect.value = issue;
+        setActiveChip(issue);
+      });
+    });
+
+    issueSelect.addEventListener('change', function () {
+      setActiveChip(issueSelect.value);
+    });
+  }
+
   function beep() {
     var AudioContext = window.AudioContext || window.webkitAudioContext;
     if (!AudioContext) return;
@@ -264,6 +292,7 @@
     var startForm = $('chatStartForm');
     var replyForm = $('chatReplyForm');
     var messageInput = $('chatMessage');
+    setupIssueChips();
     initSocket();
 
     if (state.chatId && state.token) {
