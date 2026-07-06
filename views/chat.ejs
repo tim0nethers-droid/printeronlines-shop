@@ -70,9 +70,6 @@
       <label for="chatPhone">Phone Number</label>
       <input id="chatPhone" type="tel" name="phone" placeholder="Phone Number" autocomplete="tel" required>
 
-      <label for="chatProductDisplay">Product</label>
-      <input id="chatProductDisplay" type="text" value="<%= selectedProduct.name %>" readonly>
-
       <input type="hidden" name="selectedIssue" id="selectedIssue" value="<%= (chatIssueOptions && chatIssueOptions[0]) || 'General product question' %>">
 
       <label for="chatProblem">Describe Your Problem</label>

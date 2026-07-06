@@ -129,8 +129,14 @@
 
   function setupIssueChips() {
     var issueInput = $('selectedIssue');
+    var messageBox = $('chatProblem');
     var chips = Array.prototype.slice.call(document.querySelectorAll('.issue-chip'));
+    var autoFilledText = '';
     if (!issueInput || !chips.length) return;
+
+    function issueMessage(issue) {
+      return 'I need guidance for ' + issue + '.';
+    }
 
     function setActiveChip(value) {
       chips.forEach(function (chip) {
@@ -140,16 +146,32 @@
       });
     }
 
+    function autofillIssue(value, force) {
+      if (!messageBox || !value) return;
+      var current = messageBox.value.trim();
+      if (!force && current && current !== autoFilledText) return;
+      autoFilledText = issueMessage(value);
+      messageBox.value = autoFilledText;
+    }
+
     if (!issueInput.value) issueInput.value = chips[0].getAttribute('data-issue') || 'General product question';
     setActiveChip(issueInput.value);
+    autofillIssue(issueInput.value, false);
 
     chips.forEach(function (chip) {
       chip.addEventListener('click', function () {
         var issue = chip.getAttribute('data-issue') || '';
         issueInput.value = issue;
         setActiveChip(issue);
+        autofillIssue(issue, false);
       });
     });
+
+    if (messageBox) {
+      messageBox.addEventListener('input', function () {
+        if (messageBox.value.trim() !== autoFilledText) autoFilledText = '';
+      });
+    }
   }
 
   function beep() {
