@@ -17,7 +17,8 @@
     lastRendered: '',
     pollHandle: null,
     typingTimer: null,
-    audioContext: null
+    audioContext: null,
+    starting: false
   };
 
   function $(id) {
@@ -165,13 +166,7 @@
         issueInput.value = issue;
         setActiveChip(issue);
         autofillIssue(issue, true);
-        if (startForm) {
-          if (typeof startForm.requestSubmit === 'function') {
-            startForm.requestSubmit();
-          } else {
-            startForm.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-          }
-        }
+        startHelpChat(startForm);
       });
     });
 
@@ -243,6 +238,43 @@
         renderMessages(body.chat.messages || []);
         startPolling();
       });
+  }
+
+  function startHelpChat(startForm) {
+    if (!startForm || state.starting) return;
+    state.starting = true;
+    showError($('chatStartError'), '');
+    var payload = formToObject(startForm);
+    showChatWindow({
+      productName: payload.productSlug || payload.product || 'Product',
+      status: 'Opening'
+    });
+
+    joinSocket(payload, function (joinReply) {
+      if (!joinReply || !joinReply.ok) {
+        startViaRest(payload)
+          .catch(function (error) {
+            var errors = error && error.errors ? Object.values(error.errors).join(' ') : 'Unable to start chat.';
+            showStartForm(errors);
+          })
+          .finally(function () {
+            state.starting = false;
+          });
+        return;
+      }
+      saveSession(joinReply.chat);
+      showChatWindow(joinReply.chat);
+      renderMessages(joinReply.chat.messages || []);
+      sendSocketMessage(payload.message, function (messageReply) {
+        state.starting = false;
+        if (!messageReply || !messageReply.ok) {
+          showError($('chatReplyError'), messageReply && messageReply.error ? messageReply.error : 'Unable to send message.');
+          return;
+        }
+        saveSession(messageReply.chat);
+        renderMessages(messageReply.chat.messages || []);
+      });
+    });
   }
 
   function joinSocket(payload, callback) {
@@ -331,33 +363,7 @@
     if (startForm) {
       startForm.addEventListener('submit', function (event) {
         event.preventDefault();
-        showError($('chatStartError'), '');
-        var payload = formToObject(startForm);
-        showChatWindow({
-          productName: payload.productSlug || payload.product || 'Product',
-          status: 'Opening'
-        });
-
-        joinSocket(payload, function (joinReply) {
-          if (!joinReply || !joinReply.ok) {
-            startViaRest(payload).catch(function (error) {
-              var errors = error && error.errors ? Object.values(error.errors).join(' ') : 'Unable to start chat.';
-              showStartForm(errors);
-            });
-            return;
-          }
-          saveSession(joinReply.chat);
-          showChatWindow(joinReply.chat);
-          renderMessages(joinReply.chat.messages || []);
-          sendSocketMessage(payload.message, function (messageReply) {
-            if (!messageReply || !messageReply.ok) {
-              showError($('chatReplyError'), messageReply && messageReply.error ? messageReply.error : 'Unable to send message.');
-              return;
-            }
-            saveSession(messageReply.chat);
-            renderMessages(messageReply.chat.messages || []);
-          });
-        });
+        startHelpChat(startForm);
       });
     }
 
