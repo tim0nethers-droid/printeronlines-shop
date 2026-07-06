@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const crypto = require('crypto');
+const fsSync = require('fs');
 const fs = require('fs/promises');
 const path = require('path');
 const http = require('http');
@@ -25,6 +26,7 @@ const DATA_DIR = path.join(__dirname, 'data');
 const TICKETS_FILE = path.join(DATA_DIR, 'tickets.json');
 const CHATS_FILE = path.join(DATA_DIR, 'chats.json');
 const VISITS_FILE = path.join(DATA_DIR, 'visits.json');
+const SESSIONS_FILE = path.join(DATA_DIR, 'sessions.json');
 const DISCLAIMER = 'This is an independent service request and information portal. We are not affiliated with Microsoft Corporation.';
 const SITE_URL = (process.env.SITE_URL || 'https://printeronlines.shop').replace(/\/+$/, '');
 const ADMIN_USER = process.env.ADMIN_USER || 'admin';
@@ -41,6 +43,63 @@ const slugAliases = new Map([
   ['store', 'microsoft-store']
 ]);
 const writeQueues = new Map();
+
+class JsonSessionStore extends session.Store {
+  constructor(file) {
+    super();
+    this.file = file;
+    fsSync.mkdirSync(path.dirname(file), { recursive: true });
+  }
+
+  async readStore() {
+    try {
+      const text = await fs.readFile(this.file, 'utf8');
+      return text.trim() ? JSON.parse(text) : {};
+    } catch (error) {
+      if (error.code === 'ENOENT') return {};
+      throw error;
+    }
+  }
+
+  async writeStore(sessions) {
+    const now = Date.now();
+    const activeSessions = Object.fromEntries(Object.entries(sessions).filter(([, value]) => {
+      const expires = value?.cookie?.expires ? new Date(value.cookie.expires).getTime() : now + SESSION_MAX_AGE;
+      return Number.isNaN(expires) || expires > now;
+    }));
+    await fs.writeFile(this.file, JSON.stringify(activeSessions, null, 2), 'utf8');
+  }
+
+  get(sid, callback) {
+    this.readStore()
+      .then((sessions) => callback(null, sessions[sid] || null))
+      .catch(callback);
+  }
+
+  set(sid, sess, callback = () => {}) {
+    this.readStore()
+      .then(async (sessions) => {
+        sessions[sid] = sess;
+        await this.writeStore(sessions);
+        callback(null);
+      })
+      .catch(callback);
+  }
+
+  destroy(sid, callback = () => {}) {
+    this.readStore()
+      .then(async (sessions) => {
+        delete sessions[sid];
+        await this.writeStore(sessions);
+        callback(null);
+      })
+      .catch(callback);
+  }
+
+  touch(sid, sess, callback = () => {}) {
+    this.set(sid, sess, callback);
+  }
+}
 
 app.disable('x-powered-by');
 app.set('trust proxy', 1);
@@ -80,6 +139,7 @@ app.use(express.urlencoded({ extended: false, limit: '25kb' }));
 app.use(express.json({ limit: '25kb' }));
 app.use(session({
   name: 'portal.sid',
+  store: new JsonSessionStore(SESSIONS_FILE),
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
