@@ -242,6 +242,11 @@
 
   function startHelpChat(startForm) {
     if (!startForm || state.starting) return;
+    if (typeof startForm.reportValidity === 'function' && !startForm.reportValidity()) return;
+    if (typeof startForm.checkValidity === 'function' && !startForm.checkValidity()) {
+      showError($('chatStartError'), 'Please enter your name, email address, and phone number before choosing an issue.');
+      return;
+    }
     state.starting = true;
     showError($('chatStartError'), '');
     var payload = formToObject(startForm);

@@ -232,6 +232,7 @@ function guideAssistantReplies(productSlug, issueCategory) {
   const issue = cleanText(issueCategory, 160).toLowerCase();
   const isMicrosoft = cleanSlug(productSlug) === 'microsoft';
   const safetyReply = 'Please do not share passwords, OTPs, recovery codes, product keys, payment details, or remote access information.';
+  const contactReply = 'Your request is now in the queue. A product guide representative will review it and contact you shortly.';
   const microsoftMap = [
     ['windows freeze or error', 'Your Windows freeze or error question has been received. Please share what appears on screen.'],
     ['windows update not working', 'Your Windows update question has been received. Please tell if it is stuck or failed.'],
@@ -258,7 +259,7 @@ function guideAssistantReplies(productSlug, issueCategory) {
   const guideReply = matched
     ? matched[1]
     : 'Your product question has been received. Please share a few more details so our guide assistant can review it.';
-  return [guideReply, safetyReply];
+  return [guideReply, contactReply, safetyReply];
 }
 
 function absoluteUrl(pathname = '/') {
@@ -725,6 +726,16 @@ io.on('connection', (socket) => {
 
   socket.on('customer:join', async (data = {}, callback) => {
     try {
+      const isExistingSession = Boolean(cleanText(data.sessionId, 100));
+      if (!isExistingSession) {
+        const name = cleanText(data.name, 80);
+        const phone = cleanText(data.phone, 40);
+        const email = cleanText(data.email, 120);
+        if (!name || !phone || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          if (callback) callback({ ok: false, error: 'Please enter your name, email address, and phone number before choosing an issue.' });
+          return;
+        }
+      }
       const chat = await createOrGetChatSession({
         ...data,
         ip: socket.handshake.headers['x-forwarded-for'] || socket.handshake.address || 'unknown',
