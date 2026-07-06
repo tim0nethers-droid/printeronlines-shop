@@ -59,6 +59,20 @@
     }
   }
 
+  function clearSavedSession() {
+    state.chatId = '';
+    state.token = '';
+    state.lastRendered = '';
+    if (state.pollHandle) {
+      window.clearInterval(state.pollHandle);
+      state.pollHandle = null;
+    }
+    window.localStorage.removeItem(storagePrefix + 'session_id');
+    window.localStorage.removeItem(storagePrefix + 'token');
+    window.localStorage.removeItem(storagePrefix + 'customer_name');
+    if (state.pageProduct) window.localStorage.setItem(storagePrefix + 'product', state.pageProduct);
+  }
+
   function showChatWindow(chat) {
     var startForm = $('chatStartForm');
     var chatWindow = $('chatWindow');
@@ -201,7 +215,11 @@
     if (!state.chatId || !state.token) return;
     fetch('/api/chat/' + encodeURIComponent(state.chatId) + '/messages?token=' + encodeURIComponent(state.token))
       .then(function (response) {
-        if (!response.ok) throw new Error('Chat not found');
+        if (!response.ok) {
+          var error = new Error('Chat not found');
+          error.status = response.status;
+          throw error;
+        }
         return response.json();
       })
       .then(function (data) {
@@ -209,8 +227,13 @@
         showChatWindow(data.chat || data);
         renderMessages(data.messages || (data.chat && data.chat.messages) || []);
       })
-      .catch(function () {
-        showError($('chatReplyError'), 'Unable to refresh chat messages.');
+      .catch(function (error) {
+        if (error && error.status === 404) {
+          clearSavedSession();
+          showStartForm('Your previous chat session expired. Please start a new chat.');
+          return;
+        }
+        showError($('chatReplyError'), 'Unable to refresh chat messages. Please check your connection.');
       });
   }
 
@@ -319,7 +342,10 @@
           showChatWindow(reply.chat);
           renderMessages(reply.chat.messages || []);
           state.socket.emit('customer:seen', { sessionId: state.chatId });
+          return;
         }
+        clearSavedSession();
+        showStartForm('Your previous chat session expired. Please start a new chat.');
       });
     });
 
@@ -394,6 +420,7 @@
           })
             .then(function (response) {
               return response.json().then(function (body) {
+                body.status = response.status;
                 if (!response.ok) throw body;
                 return body;
               });
@@ -404,6 +431,11 @@
               renderMessages(body.chat.messages || []);
             })
             .catch(function (error) {
+              if (error && error.status === 404) {
+                clearSavedSession();
+                showStartForm('Your previous chat session expired. Please start a new chat.');
+                return;
+              }
               showError($('chatReplyError'), error && error.error ? error.error : 'Unable to send message.');
             });
         });
