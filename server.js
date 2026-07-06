@@ -30,6 +30,7 @@ const SITE_URL = (process.env.SITE_URL || 'https://printeronlines.shop').replace
 const ADMIN_USER = process.env.ADMIN_USER || 'admin';
 const ADMIN_PASS = process.env.ADMIN_PASS || 'admin@123';
 const SESSION_SECRET = process.env.SESSION_SECRET || 'local-development-secret-change-me';
+const SESSION_MAX_AGE = 1000 * 60 * 60 * 24 * 30;
 const allowedStatuses = ['New', 'Open', 'Pending', 'In Progress', 'Closed'];
 const productBySlug = new Map(products.map((product) => [product.slug, product]));
 const slugAliases = new Map([
@@ -82,10 +83,11 @@ app.use(session({
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
+  rolling: true,
   cookie: {
     httpOnly: true,
     sameSite: 'lax',
-    maxAge: 1000 * 60 * 60 * 8
+    maxAge: SESSION_MAX_AGE
   }
 }));
 app.use(express.static(path.join(__dirname, 'public'), {
