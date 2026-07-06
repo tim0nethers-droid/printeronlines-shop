@@ -130,6 +130,7 @@
   function setupIssueChips() {
     var issueInput = $('selectedIssue');
     var messageBox = $('chatProblem');
+    var startForm = $('chatStartForm');
     var chips = Array.prototype.slice.call(document.querySelectorAll('.issue-chip'));
     var autoFilledText = '';
     if (!issueInput || !chips.length) return;
@@ -163,7 +164,14 @@
         var issue = chip.getAttribute('data-issue') || '';
         issueInput.value = issue;
         setActiveChip(issue);
-        autofillIssue(issue, false);
+        autofillIssue(issue, true);
+        if (startForm) {
+          if (typeof startForm.requestSubmit === 'function') {
+            startForm.requestSubmit();
+          } else {
+            startForm.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+          }
+        }
       });
     });
 
