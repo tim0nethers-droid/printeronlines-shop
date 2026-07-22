@@ -191,8 +191,9 @@
       var last = chat.lastMessage || {};
       var sender = last.sender || '';
       var isCustomerMessage = sender === 'visitor' || sender === 'customer';
+      var isNewSession = state.initialized && !state.lastMessageKeys[sessionId] && isCustomerMessage;
       var isNew = state.lastMessageKeys[sessionId] && state.lastMessageKeys[sessionId] !== key;
-      if (state.initialized && isNew && isCustomerMessage) {
+      if ((isNewSession || isNew) && isCustomerMessage) {
         shouldRing = true;
       }
       if (!state.lastMessageKeys[sessionId] || state.lastMessageKeys[sessionId] !== key) {

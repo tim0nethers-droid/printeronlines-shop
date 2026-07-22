@@ -869,6 +869,15 @@ io.on('connection', (socket) => {
       socket.emit('chat:init', chat);
       if (callback) callback({ ok: true, chat });
       io.to('admin').emit('visitor:online', { sessionId: chat.sessionId, online: true });
+      if (!isExistingSession) {
+        io.to('admin').emit('admin:notify', {
+          sessionId: chat.sessionId,
+          sound: true,
+          text: chat.lastMessage || chat.issueCategory || 'New chat started.',
+          name: chat.visitor?.name || 'Visitor',
+          chat
+        });
+      }
       await emitAdminChatList();
     } catch (error) {
       if (callback) callback({ ok: false, error: 'Unable to join chat.' });
