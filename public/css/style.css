@@ -2611,6 +2611,13 @@ small {
   line-height: 1.75;
 }
 
+.printer-hub-hero-copy .printer-hub-seo-copy {
+  margin-top: -6px;
+  color: #bfdbfe;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
 .printer-hub-actions {
   display: flex;
   flex-wrap: wrap;
@@ -2918,6 +2925,48 @@ small {
   gap: 16px;
 }
 
+.printer-listing-grid,
+.printer-faq-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.printer-listing-grid article,
+.printer-faq-grid article {
+  padding: 24px;
+  border: 1px solid #dbe7f4;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
+}
+
+.printer-listing-grid h3,
+.printer-faq-grid h3 {
+  margin: 0 0 14px;
+  color: #0f172a;
+  font-size: 22px;
+}
+
+.printer-listing-grid a {
+  display: block;
+  margin: 0 0 10px;
+  color: #2563eb;
+  font-weight: 900;
+  line-height: 1.35;
+  text-decoration: none;
+}
+
+.printer-listing-grid a:hover {
+  color: #0f4d8a;
+}
+
+.printer-faq-grid p {
+  margin: 0;
+  color: #64748b;
+  line-height: 1.65;
+}
+
 .printer-hub-final-cta {
   width: min(1180px, calc(100% - 40px));
   margin: 76px auto;
@@ -3096,6 +3145,8 @@ small {
   .printer-hub-service-grid,
   .printer-hub-supply-grid,
   .printer-hub-compare-grid,
+  .printer-listing-grid,
+  .printer-faq-grid,
   .printer-hub-steps,
   .printer-hub-footer-inner,
   .printer-hub-footer-bottom {

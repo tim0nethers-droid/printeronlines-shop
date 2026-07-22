@@ -1059,41 +1059,98 @@ app.get('/', (req, res, next) => {
 
 app.get('/printer', (req, res, next) => {
   const guideProducts = printerProducts();
+  const printerTopics = [
+    'Printer offline',
+    'Wireless printer setup',
+    'Driver installation',
+    'Print queue stuck',
+    'Paper jam guidance',
+    'Ink or toner question',
+    'Cartridge guidance',
+    'Drum unit guidance',
+    'Scanner setup',
+    'Printer accessories'
+  ];
+  const printerSupplyListings = [
+    ['INK', 'Ink Refilling', 'General information for inkjet cartridge refill and replacement questions.'],
+    ['TON', 'Toner Replacement', 'Guidance for laser printer toner messages and replacement planning.'],
+    ['CAR', 'Cartridge Guidance', 'Information about cartridge compatibility, low ink alerts, and installation.'],
+    ['DRM', 'Drum Unit Guidance', 'General drum unit and print quality guidance for laser printers.'],
+    ['FUS', 'Fuser Unit Topics', 'Information for smudging, heat/fuser messages, and paper handling questions.'],
+    ['CLN', 'Printhead Cleaning', 'Guidance for clogged nozzles, faded colors, and streaked prints.'],
+    ['PPR', 'Paper & Media', 'Photo paper, copy paper, labels, envelopes, and specialty media guidance.'],
+    ['SCN', 'Scanner Setup', 'Help topics for scan setup, all-in-one devices, and document scanning.']
+  ];
+  const printerFaqs = [
+    {
+      question: 'Is Printer Help Center affiliated with printer manufacturers?',
+      answer: 'No. This is an independent printer information and request portal. We are not affiliated with HP, Epson, Canon, Brother, or any printer manufacturer.'
+    },
+    {
+      question: 'Can I submit printer setup and wireless questions?',
+      answer: 'Yes. You can submit general printer setup, wireless connection, driver installation, offline status, print queue, scanner, ink, toner, cartridge, drum, and accessory questions.'
+    },
+    {
+      question: 'What information should I avoid sharing?',
+      answer: 'Do not share passwords, OTPs, product keys, payment details, remote access information, or private account credentials.'
+    },
+    {
+      question: 'Do you provide official warranty decisions?',
+      answer: 'No. For official warranty decisions, replacement eligibility, or manufacturer account services, visit the relevant manufacturer website directly.'
+    }
+  ];
   res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
   res.set('Pragma', 'no-cache');
   res.set('Expires', '0');
   renderPage(req, res, next, 'printer', {
     pageTitle: 'Printer Guide Portal',
-    seoTitle: 'Printer Setup and Supplies Guide | Independent Information Portal',
-    seoDescription: 'Independent printer guide for setup, wireless connection, driver installation, printer offline questions, ink, toner, cartridges, drum units, scanner setup, and accessories.',
-    seoKeywords: 'printer setup guide, wireless printer setup, printer offline guide, printer driver installation, ink toner cartridge guide, scanner setup',
+    seoTitle: 'Printer Setup, Driver, Ink & Toner Guide | Independent Printer Help Center',
+    seoDescription: 'Independent printer setup and supplies guide for HP, Canon, Epson, Brother, wireless setup, driver installation, printer offline questions, ink, toner, cartridges, drum units, scanner setup, paper, and accessories.',
+    seoKeywords: 'printer setup guide, wireless printer setup, printer offline guide, printer driver installation, HP printer guide, Canon printer guide, Epson printer guide, Brother printer guide, ink toner cartridge guide, drum unit guidance, scanner setup, printer accessories',
     canonicalUrl: absoluteUrl('/printer'),
     guidePage: true,
     hideSiteFooter: true,
     printerGuideProducts: guideProducts,
-    printerTopics: [
-      'Printer offline',
-      'Wireless printer setup',
-      'Driver installation',
-      'Print queue stuck',
-      'Paper jam guidance',
-      'Ink or toner question',
-      'Cartridge guidance',
-      'Drum unit guidance',
-      'Scanner setup',
-      'Printer accessories'
-    ],
+    printerTopics,
+    printerSupplyListings,
+    printerFaqs,
     jsonLd: safeJsonLd({
       '@context': 'https://schema.org',
-      '@type': 'WebPage',
-      name: 'Printer Setup and Supplies Guide',
-      description: 'Independent printer setup and supplies information portal.',
-      url: absoluteUrl('/printer'),
-      isPartOf: {
-        '@type': 'WebSite',
-        name: 'Product Help Portal',
-        url: SITE_URL
-      }
+      '@graph': [
+        {
+          '@type': 'WebPage',
+          name: 'Printer Setup, Driver, Ink and Toner Guide',
+          description: 'Independent printer setup and supplies information portal for common printer questions.',
+          url: absoluteUrl('/printer'),
+          isPartOf: {
+            '@type': 'WebSite',
+            name: 'Product Help Portal',
+            url: SITE_URL
+          },
+          about: printerTopics.map((topic) => ({ '@type': 'Thing', name: topic }))
+        },
+        {
+          '@type': 'ItemList',
+          name: 'Printer Brand Guide Listings',
+          itemListElement: guideProducts.map((product, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            name: product.name,
+            url: absoluteUrl(`/printer-chat?product=${product.slug}`)
+          }))
+        },
+        {
+          '@type': 'FAQPage',
+          mainEntity: printerFaqs.map((faq) => ({
+            '@type': 'Question',
+            name: faq.question,
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: faq.answer
+            }
+          }))
+        }
+      ]
     })
   });
 });
@@ -1945,10 +2002,14 @@ app.get('/sitemap.xml', (req, res) => {
   const urls = [
     { loc: absoluteUrl('/'), priority: '1.0' },
     { loc: absoluteUrl('/products'), priority: '0.9' },
-    { loc: absoluteUrl('/printer'), priority: '0.7' },
+    { loc: absoluteUrl('/printer'), priority: '0.9' },
     ...publicMicrosoftProducts().map((product) => ({
       loc: absoluteUrl(`/product/${product.slug}`),
       priority: '0.8'
+    })),
+    ...printerProducts().map((product) => ({
+      loc: absoluteUrl(`/product/${product.slug}`),
+      priority: '0.7'
     })),
     { loc: absoluteUrl('/faq'), priority: '0.6' },
     { loc: absoluteUrl('/contact'), priority: '0.6' },

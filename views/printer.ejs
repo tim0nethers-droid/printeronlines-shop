@@ -33,6 +33,7 @@
       <span class="printer-hub-pill">Live printer message intake</span>
       <h1>Professional Printer Help & Supplies Guide</h1>
       <p>Independent guidance for printer setup, wireless connection, driver installation, offline messages, print queue questions, ink, toner, cartridges, drums, scanner setup, and printer accessories.</p>
+      <p class="printer-hub-seo-copy">Browse independent printer guide listings for HP, Canon, Epson, Brother, wireless printer setup, driver installation, printer offline status, ink and toner questions, cartridge compatibility, drum unit guidance, paper media, scanner setup, and general printer accessory information.</p>
       <div class="printer-hub-actions">
         <a class="printer-hub-btn primary" href="/printer-chat?product=printer">Start Printer Chat</a>
         <a class="printer-hub-btn secondary" href="#brands">Choose Printer Brand</a>
@@ -123,22 +124,44 @@
       </div>
 
       <div class="printer-hub-supply-grid">
-        <% [
-          ['INK', 'Ink Refilling', 'General information for inkjet cartridge refill and replacement questions.'],
-          ['TON', 'Toner Replacement', 'Guidance for laser printer toner messages and replacement planning.'],
-          ['CAR', 'Cartridge Guidance', 'Information about cartridge compatibility, low ink alerts, and installation.'],
-          ['DRM', 'Drum Unit Guidance', 'General drum unit and print quality guidance for laser printers.'],
-          ['FUS', 'Fuser Unit Topics', 'Information for smudging, heat/fuser messages, and paper handling questions.'],
-          ['CLN', 'Printhead Cleaning', 'Guidance for clogged nozzles, faded colors, and streaked prints.'],
-          ['PPR', 'Paper & Media', 'Photo paper, copy paper, labels, envelopes, and specialty media guidance.'],
-          ['SCN', 'Scanner Setup', 'Help topics for scan setup, all-in-one devices, and document scanning.']
-        ].forEach(function(item) { %>
+        <% printerSupplyListings.forEach(function(item) { %>
           <a class="printer-hub-supply-card" href="/printer-chat?product=printer&issue=<%= encodeURIComponent(item[1]) %>">
             <span><%= item[0] %></span>
             <h3><%= item[1] %></h3>
             <p><%= item[2] %></p>
           </a>
         <% }) %>
+      </div>
+    </section>
+
+    <section class="printer-hub-section" id="listing">
+      <div class="printer-hub-section-head">
+        <span class="printer-hub-pill">Printer listing</span>
+        <h2>Printer Guide Listings</h2>
+        <p>Choose a printer brand, setup topic, supply topic, or accessory topic from this independent listing.</p>
+      </div>
+
+      <div class="printer-listing-grid">
+        <article>
+          <h3>Brand Guides</h3>
+          <% printerGuideProducts.forEach(function(product) { %>
+            <a href="/printer-chat?product=<%= product.slug %>"><%= product.name %> Guide</a>
+          <% }) %>
+        </article>
+
+        <article>
+          <h3>Setup Topics</h3>
+          <% printerTopics.slice(0, 6).forEach(function(topic) { %>
+            <a href="/printer-chat?product=printer&issue=<%= encodeURIComponent(topic) %>"><%= topic %></a>
+          <% }) %>
+        </article>
+
+        <article>
+          <h3>Supplies & Accessories</h3>
+          <% printerSupplyListings.slice(0, 6).forEach(function(item) { %>
+            <a href="/printer-chat?product=printer&issue=<%= encodeURIComponent(item[1]) %>"><%= item[1] %></a>
+          <% }) %>
+        </article>
       </div>
     </section>
 
@@ -165,6 +188,23 @@
           <p>Best for print, scan, copy, document sharing, and multi-user home or office workflows.</p>
           <small>Common models: OfficeJet, WorkForce, MFC</small>
         </article>
+      </div>
+    </section>
+
+    <section class="printer-hub-section" id="faq">
+      <div class="printer-hub-section-head">
+        <span class="printer-hub-pill">FAQ</span>
+        <h2>Printer Help Center FAQs</h2>
+        <p>Common questions about this independent printer information portal.</p>
+      </div>
+
+      <div class="printer-faq-grid">
+        <% printerFaqs.forEach(function(faq) { %>
+          <article>
+            <h3><%= faq.question %></h3>
+            <p><%= faq.answer %></p>
+          </article>
+        <% }) %>
       </div>
     </section>
 
@@ -244,8 +284,9 @@
         <a href="#supplies">Ink & Toner</a>
         <a href="#setup">Setup Steps</a>
         <a href="#compare">Compare Printers</a>
+        <a href="#listing">Printer Listing</a>
+        <a href="#faq">FAQs</a>
         <a href="/request?product=printer">Submit Request</a>
-        <a href="/contact">Contact</a>
       </div>
     </div>
 
