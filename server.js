@@ -584,6 +584,8 @@ async function getChatList(productFilter = '') {
   const filter = cleanSlug(productFilter);
   const filtered = filter === 'printer-family'
     ? normalized.filter((chat) => isPrinterProductSlug(chat.productSlug))
+    : filter === 'microsoft-family'
+      ? normalized.filter((chat) => !isPrinterProductSlug(chat.productSlug))
     : filter
       ? normalized.filter((chat) => chat.productSlug === filter)
       : normalized;
@@ -898,7 +900,8 @@ io.on('connection', (socket) => {
         sessionId: updatedChat.sessionId,
         sound: true,
         text: result.message.text,
-        name: updatedChat.visitor?.name || 'Visitor'
+        name: updatedChat.visitor?.name || 'Visitor',
+        chat: updatedChat
       });
       await emitAdminChatList();
       if (callback) callback({ ok: true, message: result.message, chat: updatedChat });
@@ -1458,7 +1461,8 @@ app.post('/api/chats/:sessionId/message', submitLimiter, asyncRoute(async (req, 
         sessionId: result.chat.sessionId,
         sound: true,
         text: result.message.text,
-        name: result.chat.visitor?.name || 'Visitor'
+        name: result.chat.visitor?.name || 'Visitor',
+        chat: result.chat
       });
     }
     await emitAdminChatList();
@@ -1511,7 +1515,8 @@ app.post('/admin/logout', requireAdmin, (req, res) => {
   });
 });
 
-app.get('/admin/dashboard', requireAdmin, asyncRoute(async (req, res, next) => {
+async function renderDashboard(req, res, next, adminMode = 'microsoft') {
+  const isPrinterMode = adminMode === 'printer';
   const productFilter = cleanSlug(req.query.product || '');
   const statusFilter = cleanSlug(req.query.status || '');
   const [tickets, chats, visits] = await Promise.all([
@@ -1519,18 +1524,27 @@ app.get('/admin/dashboard', requireAdmin, asyncRoute(async (req, res, next) => {
     readJson(CHATS_FILE, []),
     readJson(VISITS_FILE, [])
   ]);
+  const modeProducts = isPrinterMode ? printerProducts() : publicMicrosoftProducts();
+  const modeProductSlugs = new Set(modeProducts.map((product) => product.slug));
+  const modeTickets = tickets.filter((ticket) => modeProductSlugs.has(ticket.productSlug));
+  const modeChats = chats.filter((chat) => modeProductSlugs.has(chat.productSlug));
+  const modeVisits = visits.filter((visit) => {
+    const isPrinterVisit = modeProductSlugs.has(visit.productSlug) || String(visit.path || '').startsWith('/printer');
+    if (isPrinterMode) return isPrinterVisit;
+    return !isPrinterVisit;
+  });
   const productTickets = productFilter
-    ? tickets.filter((ticket) => ticket.productSlug === productFilter)
-    : tickets;
+    ? modeTickets.filter((ticket) => ticket.productSlug === productFilter)
+    : modeTickets;
   const filteredTickets = statusFilter
     ? productTickets.filter((ticket) => cleanSlug(ticket.status || '') === statusFilter)
     : productTickets;
   const filteredChats = productFilter
-    ? chats.filter((chat) => chat.productSlug === productFilter)
-    : chats;
+    ? modeChats.filter((chat) => chat.productSlug === productFilter)
+    : modeChats;
   const filteredVisits = productFilter
-    ? visits.filter((visit) => visit.productSlug === productFilter)
-    : visits;
+    ? modeVisits.filter((visit) => visit.productSlug === productFilter)
+    : modeVisits;
   const todayVisitors = new Set(
     filteredVisits
       .filter((visit) => isToday(visit.createdAt))
@@ -1544,7 +1558,19 @@ app.get('/admin/dashboard', requireAdmin, asyncRoute(async (req, res, next) => {
     .slice(0, 6);
 
   renderAdminPage(req, res, next, 'admin-dashboard', {
-    pageTitle: 'Admin Dashboard',
+    pageTitle: isPrinterMode ? 'Printer Admin Dashboard' : 'Microsoft Admin Dashboard',
+    adminMode,
+    adminTitle: isPrinterMode ? 'Printer Admin Dashboard' : 'Microsoft Admin Dashboard',
+    adminSubtitle: isPrinterMode
+      ? 'Track printer requests, printer chats, and printer visitors only.'
+      : 'Track Microsoft product requests, Microsoft chats, and visitors only.',
+    adminBrandText: isPrinterMode ? 'Printer Help Center' : 'Product Help Portal',
+    adminBrandLogo: isPrinterMode ? 'PR' : 'MP',
+    dashboardPath: isPrinterMode ? '/admin/printer-dashboard' : '/admin/dashboard',
+    otherDashboardPath: isPrinterMode ? '/admin/dashboard' : '/admin/printer-dashboard',
+    otherDashboardLabel: isPrinterMode ? 'Microsoft Admin' : 'Printer Admin',
+    livePath: isPrinterMode ? '/admin/printer-live' : '/admin/live',
+    productList: modeProducts,
     stats: {
       totalRequests: filteredTickets.length,
       openChats: filteredChats.filter((chat) => chat.status !== 'Closed').length,
@@ -1558,6 +1584,14 @@ app.get('/admin/dashboard', requireAdmin, asyncRoute(async (req, res, next) => {
     statusFilter,
     toast: cleanText(req.query.toast || '', 80)
   });
+}
+
+app.get('/admin/dashboard', requireAdmin, asyncRoute(async (req, res, next) => {
+  return renderDashboard(req, res, next, 'microsoft');
+}));
+
+app.get('/admin/printer-dashboard', requireAdmin, asyncRoute(async (req, res, next) => {
+  return renderDashboard(req, res, next, 'printer');
 }));
 
 app.post('/admin/tickets/:token/status', requireAdmin, asyncRoute(async (req, res) => {
@@ -1575,20 +1609,21 @@ app.post('/admin/tickets/:token/status', requireAdmin, asyncRoute(async (req, re
 
   const product = cleanSlug(req.body.productFilter || '');
   const statusFilter = cleanSlug(req.body.statusFilter || '');
+  const adminMode = cleanSlug(req.body.adminMode || '') === 'printer' ? 'printer' : 'microsoft';
   const params = new URLSearchParams();
   if (product) params.set('product', product);
   if (statusFilter) params.set('status', statusFilter);
   params.set('toast', 'request-status-updated');
-  return res.redirect(`/admin/dashboard?${params.toString()}`);
+  return res.redirect(`${adminMode === 'printer' ? '/admin/printer-dashboard' : '/admin/dashboard'}?${params.toString()}`);
 }));
 
 app.get('/admin/live', requireAdmin, (req, res, next) => {
   renderAdminPage(req, res, next, 'admin-live', {
-    pageTitle: 'Admin Live Chat',
-    liveTitle: 'Live Chat',
-    liveMode: 'all',
-    defaultProductFilter: '',
-    liveProducts: products,
+    pageTitle: 'Microsoft Admin Live Chat',
+    liveTitle: 'Microsoft Live Chat',
+    liveMode: 'microsoft',
+    defaultProductFilter: 'microsoft-family',
+    liveProducts: publicMicrosoftProducts(),
     toast: ''
   });
 });

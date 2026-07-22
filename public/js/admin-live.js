@@ -140,6 +140,14 @@
     return slug.indexOf('printer') !== -1 || iconClass.indexOf('printer') !== -1;
   }
 
+  function isChatAllowedForMode(chat) {
+    var shell = document.querySelector('.admin-live');
+    var mode = shell ? shell.dataset.liveMode : '';
+    if (mode === 'printer') return isPrinterChat(chat);
+    if (mode === 'microsoft') return !isPrinterChat(chat);
+    return true;
+  }
+
   function chatMatchesSearch(chat) {
     if (!state.searchQuery) return true;
     var visitor = chat.visitor || {};
@@ -202,8 +210,11 @@
     if (!list) return;
     var filter = selectedFilter();
     var visibleChats = chats.filter(function (chat) {
-      var productMatches = !filter || (filter === 'printer-family' ? isPrinterChat(chat) : chat.productSlug === filter);
-      return productMatches && chatMatchesListFilter(chat) && chatMatchesSearch(chat);
+      var productMatches = !filter
+        || (filter === 'printer-family' ? isPrinterChat(chat)
+          : filter === 'microsoft-family' ? !isPrinterChat(chat)
+            : chat.productSlug === filter);
+      return isChatAllowedForMode(chat) && productMatches && chatMatchesListFilter(chat) && chatMatchesSearch(chat);
     });
     list.innerHTML = '';
 
@@ -413,8 +424,9 @@
   }
 
   function applyChatList(chats) {
-    detectNewCustomerMessages(chats || []);
-    state.chats = chats || [];
+    var allowedChats = (chats || []).filter(isChatAllowedForMode);
+    detectNewCustomerMessages(allowedChats);
+    state.chats = allowedChats;
     if (!state.selectedId && state.chats.length) state.selectedId = state.chats[0].sessionId || state.chats[0].id;
     if (state.selectedId && !state.chats.some(function (chat) { return (chat.sessionId || chat.id) === state.selectedId; })) {
       state.selectedId = state.chats.length ? (state.chats[0].sessionId || state.chats[0].id) : '';
@@ -562,6 +574,7 @@
     });
 
     state.socket.on('admin:notify', function (payload) {
+      if (payload && payload.chat && !isChatAllowedForMode(payload.chat)) return;
       if (isSoundEnabled()) playRing(10000);
       if (window.showToast) {
         window.showToast('New message from ' + ((payload && payload.name) || 'visitor') + '.', 'info');

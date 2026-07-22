@@ -1,21 +1,21 @@
 <div class="admin-shell">
   <aside class="admin-sidebar">
     <div class="admin-brand">
-      <div class="admin-brand-logo">MP</div>
+      <div class="admin-brand-logo"><%= adminBrandLogo || 'MP' %></div>
       <div>
-        <strong>Product Help Portal</strong>
+        <strong><%= adminBrandText || 'Product Help Portal' %></strong>
         <small>Admin Panel</small>
       </div>
     </div>
 
     <nav class="admin-nav" aria-label="Admin navigation">
-        <a class="active" href="/admin/dashboard">Dashboard</a>
-        <a href="/admin/live">Live Chat <span class="nav-badge"><%= stats.openChats || 0 %></span></a>
-        <a href="/admin/printer-live">Printer Chat</a>
-        <a href="/admin/dashboard">Requests <span class="nav-badge"><%= stats.totalRequests || 0 %></span></a>
+        <a class="active" href="<%= dashboardPath || '/admin/dashboard' %>">Dashboard</a>
+        <a href="<%= livePath || '/admin/live' %>">Live Chat <span class="nav-badge"><%= stats.openChats || 0 %></span></a>
+        <a href="<%= otherDashboardPath || '/admin/printer-dashboard' %>"><%= otherDashboardLabel || 'Printer Admin' %></a>
+        <a href="<%= dashboardPath || '/admin/dashboard' %>">Requests <span class="nav-badge"><%= stats.totalRequests || 0 %></span></a>
       <a href="/admin/reports">Reports</a>
       <a href="/admin/reports">Visitors</a>
-      <a href="/admin/dashboard">Settings</a>
+      <a href="<%= dashboardPath || '/admin/dashboard' %>">Settings</a>
       <form class="sidebar-logout" action="/admin/logout" method="post">
         <button type="submit">Logout</button>
       </form>
@@ -24,7 +24,7 @@
     <div class="sidebar-help-card">
       <h3>Need Help?</h3>
       <p>Open the live chat workspace to review and answer visitor messages.</p>
-      <a href="/admin/live">Open Live Chat</a>
+      <a href="<%= livePath || '/admin/live' %>">Open Live Chat</a>
     </div>
 
   </aside>
@@ -35,25 +35,25 @@
         <div class="hero-icon">DATA</div>
         <div>
           <h2>Admin Command Center</h2>
-          <p>Track service requests, live chats, visitors, and product activity in one place.</p>
+          <p><%= adminSubtitle || 'Track service requests, live chats, visitors, and product activity in one place.' %></p>
         </div>
       </div>
 
         <div class="hero-actions">
-          <a href="/admin/live">Live Chat</a>
-          <a href="/admin/printer-live">Printer Chat</a>
+          <a href="<%= livePath || '/admin/live' %>">Live Chat</a>
+          <a href="<%= otherDashboardPath || '/admin/printer-dashboard' %>"><%= otherDashboardLabel || 'Printer Admin' %></a>
           <a href="/admin/reports">Reports</a>
         <a data-toast-export href="/admin/reports/export?type=all">Export Data</a>
       </div>
     </section>
 
     <section class="admin-filter-card">
-      <form class="admin-filter-row" method="get" action="/admin/dashboard">
+      <form class="admin-filter-row" method="get" action="<%= dashboardPath || '/admin/dashboard' %>">
         <div class="admin-field">
           <label for="productFilter">Product Filter</label>
           <select id="productFilter" name="product">
             <option value="">All Products</option>
-            <% products.forEach((product) => { %>
+            <% (productList || products).forEach((product) => { %>
               <option value="<%= product.slug %>" <%= product.slug === productFilter ? 'selected' : '' %>><%= product.name %></option>
             <% }) %>
           </select>
@@ -70,7 +70,7 @@
         </div>
 
         <button class="admin-btn primary" type="submit">Apply Filters</button>
-        <a class="admin-btn" data-toast-reset href="/admin/dashboard">Reset</a>
+        <a class="admin-btn" data-toast-reset href="<%= dashboardPath || '/admin/dashboard' %>">Reset</a>
       </form>
     </section>
 
@@ -117,7 +117,7 @@
         <div class="admin-card-header">
           <h2>Latest Requests</h2>
           <div>
-            <a class="admin-btn" href="/admin/dashboard">View All</a>
+            <a class="admin-btn" href="<%= dashboardPath || '/admin/dashboard' %>">View All</a>
             <a class="admin-btn" data-toast-export href="/admin/reports/export?type=tickets">Export</a>
           </div>
         </div>
@@ -173,6 +173,7 @@
                       <form class="admin-status-form" action="/admin/tickets/<%= ticket.token %>/status" method="post">
                         <input type="hidden" name="productFilter" value="<%= productFilter %>">
                         <input type="hidden" name="statusFilter" value="<%= statusFilter %>">
+                        <input type="hidden" name="adminMode" value="<%= adminMode || 'microsoft' %>">
                         <select name="status" aria-label="Update status for <%= ticket.token %>">
                           <% allowedStatuses.forEach((status) => { %>
                             <option value="<%= status %>" <%= status === ticket.status ? 'selected' : '' %>><%= status %></option>
@@ -193,7 +194,7 @@
         <div class="admin-side-card">
           <div class="admin-card-header compact">
             <h2>Recent Live Chats</h2>
-            <a href="/admin/live">View All</a>
+            <a href="<%= livePath || '/admin/live' %>">View All</a>
           </div>
 
           <div class="recent-chat-list">
@@ -205,7 +206,7 @@
               <% recentChats.forEach((chat) => { %>
                 <% const chatProduct = products.find((item) => item.slug === chat.productSlug); %>
                 <% const lastMessage = chat.messages && chat.messages.length ? chat.messages[chat.messages.length - 1].text : 'No message yet'; %>
-                <a class="recent-chat-item" href="/admin/live?session=<%= chat.id %>">
+                <a class="recent-chat-item" href="<%= livePath || '/admin/live' %>?session=<%= chat.id %>">
                   <div class="avatar"><%= chat.visitor && chat.visitor.name ? chat.visitor.name[0].toUpperCase() : 'U' %></div>
                   <div>
                     <strong><%= chat.visitor ? chat.visitor.name : 'Unknown visitor' %></strong>
@@ -228,8 +229,8 @@
         <div class="admin-side-card">
           <h2>Quick Actions</h2>
           <div class="quick-action-grid">
-              <a href="/admin/live">Open Live Chat</a>
-              <a href="/admin/printer-live">Open Printer Chat</a>
+              <a href="<%= livePath || '/admin/live' %>">Open Live Chat</a>
+              <a href="<%= otherDashboardPath || '/admin/printer-dashboard' %>"><%= otherDashboardLabel || 'Printer Admin' %></a>
               <a href="/admin/reports">View Reports</a>
             <a data-toast-export href="/admin/reports/export?type=all">Export Data</a>
           </div>
