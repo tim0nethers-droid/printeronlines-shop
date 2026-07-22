@@ -4121,6 +4121,20 @@ canvas {
   font-weight: 950;
 }
 
+.printer-hub-footer-toggle {
+  width: 100%;
+  margin: 0 0 14px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 950;
+  line-height: 1.2;
+  text-align: left;
+  cursor: default;
+}
+
 .printer-hub-footer a {
   display: block;
   color: #c7d7ee;
@@ -4260,6 +4274,51 @@ canvas {
   .printer-hub-footer-inner,
   .printer-hub-footer-bottom {
     width: min(100% - 28px, 1180px);
+  }
+}
+
+/* ===== Printer Footer Mobile Dropdown ===== */
+@media (max-width: 720px) {
+  .printer-hub-footer-col {
+    border-top: 1px solid rgba(219, 234, 254, 0.16);
+    padding-top: 2px;
+  }
+
+  .printer-hub-footer-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 48px;
+    margin: 0;
+    color: #ffffff;
+    cursor: pointer;
+  }
+
+  .printer-hub-footer-toggle::after {
+    content: "";
+    width: 9px;
+    height: 9px;
+    border-right: 2px solid #9fb3d0;
+    border-bottom: 2px solid #9fb3d0;
+    transform: rotate(45deg);
+    transition: transform 0.18s ease;
+  }
+
+  .printer-hub-footer-col > a {
+    display: none !important;
+    margin-bottom: 10px;
+  }
+
+  .printer-hub-footer-col.footer-open > a {
+    display: block !important;
+  }
+
+  .printer-hub-footer-col.footer-open .printer-hub-footer-toggle {
+    margin-bottom: 8px;
+  }
+
+  .printer-hub-footer-col.footer-open .printer-hub-footer-toggle::after {
+    transform: rotate(225deg);
   }
 }
 
