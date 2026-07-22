@@ -261,6 +261,10 @@ function printerProducts() {
   return products.filter((product) => isPrinterProductSlug(product.slug));
 }
 
+function publicMicrosoftProducts() {
+  return products.filter((product) => !isPrinterProductSlug(product.slug));
+}
+
 function withProductMeta(chat) {
   const productMeta = selectedProductFrom(chat.productSlug);
   return {
@@ -732,9 +736,9 @@ function asyncRoute(handler) {
 }
 
 function baseLocals(req, extra = {}) {
-  const defaultTitle = 'Product Help Portal | Independent Product and Printer Guides';
-  const defaultDescription = 'Independent product and printer help guides, service requests, and live chat intake. Not affiliated with Microsoft Corporation or printer manufacturers.';
-  const defaultKeywords = 'Microsoft product guide, printer setup guide, Windows guide, Excel guide, wireless printer setup, service request portal';
+  const defaultTitle = 'Product Help Portal | Independent Microsoft Product Guides';
+  const defaultDescription = 'Independent Microsoft product help guides, service requests, and live chat intake. Not affiliated with Microsoft Corporation.';
+  const defaultKeywords = 'Microsoft product guide, Windows guide, Excel guide, Word guide, Outlook guide, service request portal';
   const canonicalPath = req.path === '/' ? '/' : req.path.replace(/\/+$/, '');
   const seoTitle = extra.seoTitle || extra.pageTitle || defaultTitle;
   const seoDescription = extra.seoDescription || defaultDescription;
@@ -1019,25 +1023,62 @@ function windowClearCustomerOnline(sessionId) {
 }
 
 app.get('/', (req, res, next) => {
+  const microsoftProducts = publicMicrosoftProducts();
   renderPage(req, res, next, 'index', {
     pageTitle: 'Product Help Portal | Independent Microsoft Product Guides',
-    seoTitle: 'Product Help Portal | Independent Product and Printer Guides',
-    seoDescription: 'Independent product information portal with Microsoft product guides, printer setup guidance, wireless printer help, service requests, and live chat intake.',
-    seoKeywords: 'Microsoft product information portal, printer setup guide, wireless printer setup, Windows help guide, Excel guide, service request portal',
+    seoTitle: 'Product Help Portal | Independent Microsoft Product Guides',
+    seoDescription: 'Independent Microsoft product information portal with Windows, Excel, Word, Outlook, OneDrive, Teams, Microsoft 365, service requests, and live chat intake.',
+    seoKeywords: 'Microsoft product information portal, Windows help guide, Excel guide, Word guide, Outlook guide, service request portal',
     canonicalUrl: absoluteUrl('/'),
-    popularProducts: products.slice(0, 6),
-    featuredProducts: products
+    popularProducts: microsoftProducts.slice(0, 6),
+    featuredProducts: microsoftProducts
+  });
+});
+
+app.get('/printer', (req, res, next) => {
+  const guideProducts = printerProducts();
+  renderPage(req, res, next, 'printer', {
+    pageTitle: 'Printer Guide Portal',
+    seoTitle: 'Printer Setup and Supplies Guide | Independent Information Portal',
+    seoDescription: 'Independent printer guide for setup, wireless connection, driver installation, printer offline questions, ink, toner, cartridges, drum units, scanner setup, and accessories.',
+    seoKeywords: 'printer setup guide, wireless printer setup, printer offline guide, printer driver installation, ink toner cartridge guide, scanner setup',
+    canonicalUrl: absoluteUrl('/printer'),
+    printerGuideProducts: guideProducts,
+    printerTopics: [
+      'Printer offline',
+      'Wireless printer setup',
+      'Driver installation',
+      'Print queue stuck',
+      'Paper jam guidance',
+      'Ink or toner question',
+      'Cartridge guidance',
+      'Drum unit guidance',
+      'Scanner setup',
+      'Printer accessories'
+    ],
+    jsonLd: safeJsonLd({
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: 'Printer Setup and Supplies Guide',
+      description: 'Independent printer setup and supplies information portal.',
+      url: absoluteUrl('/printer'),
+      isPartOf: {
+        '@type': 'WebSite',
+        name: 'Product Help Portal',
+        url: SITE_URL
+      }
+    })
   });
 });
 
 app.get('/products', (req, res, next) => {
   renderPage(req, res, next, 'products', {
-    pageTitle: 'Product and Printer Guides | Independent Product Help Portal',
-    seoTitle: 'Product and Printer Guides | Independent Product Help Portal',
-    seoDescription: 'Browse independent product guides for Microsoft apps, Windows, printer setup, HP Printer, Canon Printer, Epson Printer, Brother Printer, wireless setup, and supplies guidance.',
-    seoKeywords: 'product guides, printer setup guide, HP printer guide, Canon printer guide, Epson printer guide, Microsoft product guides, Windows guide',
+    pageTitle: 'Microsoft Product Guides | Independent Product Help Portal',
+    seoTitle: 'Microsoft Product Guides | Independent Product Help Portal',
+    seoDescription: 'Browse independent Microsoft product guides for Windows, Excel, Word, PowerPoint, Outlook, OneDrive, Teams, Microsoft 365, Edge, Surface, Xbox, Azure, and more.',
+    seoKeywords: 'Microsoft product guides, Windows guide, Excel guide, Word guide, Outlook guide, OneDrive guide, Teams guide',
     canonicalUrl: absoluteUrl('/products'),
-    productList: products
+    productList: publicMicrosoftProducts()
   });
 });
 
@@ -1837,7 +1878,8 @@ app.get('/sitemap.xml', (req, res) => {
   const urls = [
     { loc: absoluteUrl('/'), priority: '1.0' },
     { loc: absoluteUrl('/products'), priority: '0.9' },
-    ...products.map((product) => ({
+    { loc: absoluteUrl('/printer'), priority: '0.7' },
+    ...publicMicrosoftProducts().map((product) => ({
       loc: absoluteUrl(`/product/${product.slug}`),
       priority: '0.8'
     })),

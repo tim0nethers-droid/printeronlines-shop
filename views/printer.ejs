@@ -1,0 +1,78 @@
+<section class="printer-site">
+  <div class="printer-site-hero">
+    <div class="printer-hero-copy">
+      <span class="eyebrow">Independent printer guide</span>
+      <h1>Printer Setup & Supplies Guide</h1>
+      <p>Find general information for printer setup, wireless connection, driver installation, offline messages, ink, toner, cartridges, drum units, scanner setup, and accessories.</p>
+      <div class="printer-hero-actions">
+        <a class="button primary" href="/printer-chat?product=printer">Start Printer Chat</a>
+        <a class="button secondary" href="#printer-guides">Browse Printer Guides</a>
+      </div>
+      <p class="printer-disclaimer">This printer section is an independent information and request portal. We are not affiliated with any printer manufacturer and we do not claim to provide official manufacturer services.</p>
+    </div>
+    <div class="printer-hero-card" aria-label="Printer guide highlights">
+      <div class="product-logo printer"><span>PRN</span></div>
+      <h2>Printer Help Topics</h2>
+      <ul>
+        <li>Wireless and USB setup guidance</li>
+        <li>Offline, queue, and paper jam questions</li>
+        <li>Ink, toner, cartridge, and drum guidance</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="section printer-section" id="printer-guides">
+  <div class="section-heading">
+    <span class="eyebrow">Printer guides</span>
+    <h2>Choose a printer topic</h2>
+    <a href="/printer-chat?product=printer">Open printer chat</a>
+  </div>
+
+  <div class="printer-guide-grid">
+    <% printerGuideProducts.forEach(function(product) { %>
+      <article class="product-card printer-guide-card">
+        <div class="product-card-main">
+          <div class="product-logo <%= product.iconClass %>" aria-hidden="true"><span><%= product.iconText %></span></div>
+          <h3><%= product.name %></h3>
+          <p class="product-desc"><%= product.description %></p>
+        </div>
+        <div class="issue-tags">
+          <% product.categories.slice(0, 3).forEach(function(category) { %>
+            <span><%= categoryTitle(category) %></span>
+          <% }) %>
+        </div>
+        <div class="card-actions">
+          <a class="btn btn-primary" href="/printer-chat?product=<%= product.slug %>">Start Printer Chat</a>
+          <a class="btn btn-outline" href="/request?product=<%= product.slug %>">Submit Request</a>
+        </div>
+      </article>
+    <% }) %>
+  </div>
+</section>
+
+<section class="section printer-section">
+  <div class="section-heading">
+    <span class="eyebrow">Common topics</span>
+    <h2>Printer questions visitors ask often</h2>
+  </div>
+
+  <div class="printer-topic-grid">
+    <% printerTopics.forEach(function(topic) { %>
+      <a class="printer-topic-card" href="/printer-chat?product=printer&issue=<%= encodeURIComponent(topic) %>">
+        <span class="printer-topic-icon">PR</span>
+        <strong><%= topic %></strong>
+        <small>Open a printer chat intake for this topic.</small>
+      </a>
+    <% }) %>
+  </div>
+</section>
+
+<section class="printer-supplies-band">
+  <div>
+    <span class="eyebrow">Supplies and accessories</span>
+    <h2>Ink, toner, cartridges, drum units, and printer accessories</h2>
+    <p>Use this section for general supply compatibility questions, replacement guidance, scanner setup questions, and common printer accessory topics. Please do not share payment details, passwords, OTPs, product keys, or remote access information.</p>
+  </div>
+  <a class="button primary" href="/printer-chat?product=printer">Start Printer Chat</a>
+</section>
