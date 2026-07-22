@@ -2720,6 +2720,38 @@ small {
   background: #eff6ff;
 }
 
+.printer-ad-policy {
+  width: min(1180px, calc(100% - 40px));
+  margin: -46px auto 0;
+  position: relative;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.printer-ad-policy article {
+  padding: 20px;
+  border: 1px solid #dbe7f4;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.1);
+}
+
+.printer-ad-policy strong {
+  display: block;
+  color: #0f172a;
+  font-size: 17px;
+  font-weight: 950;
+}
+
+.printer-ad-policy p {
+  margin: 8px 0 0;
+  color: #64748b;
+  line-height: 1.55;
+  font-size: 14px;
+}
+
 .printer-hub-section {
   width: min(1180px, calc(100% - 40px));
   margin: 0 auto;
@@ -3141,6 +3173,7 @@ small {
   }
 
   .printer-hub-stats,
+  .printer-ad-policy,
   .printer-hub-brand-grid,
   .printer-hub-service-grid,
   .printer-hub-supply-grid,

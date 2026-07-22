@@ -1095,8 +1095,8 @@ app.get('/printer', (req, res, next) => {
       answer: 'Do not share passwords, OTPs, product keys, payment details, remote access information, or private account credentials.'
     },
     {
-      question: 'Do you provide official warranty decisions?',
-      answer: 'No. For official warranty decisions, replacement eligibility, or manufacturer account services, visit the relevant manufacturer website directly.'
+      question: 'Do you provide manufacturer warranty decisions?',
+      answer: 'No. For warranty decisions, replacement eligibility, or manufacturer account services, visit the relevant manufacturer-owned website directly.'
     }
   ];
   res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
