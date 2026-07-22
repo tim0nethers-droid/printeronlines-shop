@@ -1,7 +1,11 @@
 <section class="admin-header">
-  <div>
-    <span class="eyebrow">Admin</span>
-    <h1><%= liveTitle || 'Live Chat' %></h1>
+  <div class="admin-live-title-row">
+    <div class="admin-brand-logo admin-live-logo <%= liveMode === 'printer' ? 'printer-admin-logo' : 'microsoft-admin-logo' %>"><%= adminBrandLogo || (liveMode === 'printer' ? 'PR' : 'MP') %></div>
+    <div>
+      <span class="eyebrow">Admin</span>
+      <h1><%= liveTitle || 'Live Chat' %></h1>
+      <p><%= adminBrandText || (liveMode === 'printer' ? 'Printer Help Center' : 'Product Help Portal') %></p>
+    </div>
   </div>
   <div class="admin-actions">
     <a class="button secondary" href="<%= liveMode === 'printer' ? '/admin/printer-dashboard' : '/admin/dashboard' %>">Dashboard</a>

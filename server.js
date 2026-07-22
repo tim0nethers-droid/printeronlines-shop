@@ -1622,6 +1622,8 @@ app.get('/admin/live', requireAdmin, (req, res, next) => {
     pageTitle: 'Microsoft Admin Live Chat',
     liveTitle: 'Microsoft Live Chat',
     liveMode: 'microsoft',
+    adminBrandText: 'Product Help Portal',
+    adminBrandLogo: 'MP',
     defaultProductFilter: 'microsoft-family',
     liveProducts: publicMicrosoftProducts(),
     toast: ''
@@ -1633,6 +1635,8 @@ app.get('/admin/printer-live', requireAdmin, (req, res, next) => {
     pageTitle: 'Admin Printer Live Chat',
     liveTitle: 'Printer Live Chat',
     liveMode: 'printer',
+    adminBrandText: 'Printer Help Center',
+    adminBrandLogo: 'PR',
     defaultProductFilter: 'printer-family',
     liveProducts: printerProducts(),
     toast: ''

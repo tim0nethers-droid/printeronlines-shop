@@ -1,7 +1,7 @@
 <div class="admin-shell">
   <aside class="admin-sidebar">
     <div class="admin-brand">
-      <div class="admin-brand-logo"><%= adminBrandLogo || 'MP' %></div>
+      <div class="admin-brand-logo <%= adminMode === 'printer' ? 'printer-admin-logo' : 'microsoft-admin-logo' %>"><%= adminBrandLogo || 'MP' %></div>
       <div>
         <strong><%= adminBrandText || 'Product Help Portal' %></strong>
         <small>Admin Panel</small>
