@@ -1043,6 +1043,8 @@ app.get('/printer', (req, res, next) => {
     seoDescription: 'Independent printer guide for setup, wireless connection, driver installation, printer offline questions, ink, toner, cartridges, drum units, scanner setup, and accessories.',
     seoKeywords: 'printer setup guide, wireless printer setup, printer offline guide, printer driver installation, ink toner cartridge guide, scanner setup',
     canonicalUrl: absoluteUrl('/printer'),
+    guidePage: true,
+    hideSiteFooter: true,
     printerGuideProducts: guideProducts,
     printerTopics: [
       'Printer offline',

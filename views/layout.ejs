@@ -74,6 +74,7 @@
       <%- body %>
     </main>
 
+    <% if (!hideSiteFooter) { %>
     <footer class="site-footer">
       <div class="footer-inner">
         <div class="footer-col footer-brand">
@@ -136,6 +137,7 @@
         <span>Independent information portal. Not affiliated with Microsoft Corporation.</span>
       </div>
     </footer>
+    <% } %>
   </div>
   <script src="/js/main.js?v=20260630-footer-default-closed"></script>
   <% if (currentPath.startsWith('/admin')) { %>
