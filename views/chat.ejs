@@ -80,7 +80,7 @@
 
 <main class="chat-page <%= isPrinterChat ? 'printer-chat-page' : '' %>">
   <section class="chat-card <%= isPrinterChat ? 'printer-chat-card' : '' %>">
-    <div class="chat-product-logo product-logo <%= selectedProduct.iconClass %>" aria-hidden="true">
+    <div class="chat-product-logo product-logo <%= isPrinterChat ? 'printer-brand-logo' : '' %> <%= selectedProduct.iconClass %>" aria-hidden="true">
       <span><%= selectedProduct.iconText %></span>
     </div>
 
