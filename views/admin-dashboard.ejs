@@ -11,7 +11,6 @@
     <nav class="admin-nav" aria-label="Admin navigation">
         <a class="active" href="<%= dashboardPath || '/admin/dashboard' %>">Dashboard</a>
         <a href="<%= livePath || '/admin/live' %>">Live Chat <span class="nav-badge"><%= stats.openChats || 0 %></span></a>
-        <a href="<%= otherDashboardPath || '/admin/printer-dashboard' %>"><%= otherDashboardLabel || 'Printer Admin' %></a>
         <a href="<%= dashboardPath || '/admin/dashboard' %>">Requests <span class="nav-badge"><%= stats.totalRequests || 0 %></span></a>
       <a href="/admin/reports">Reports</a>
       <a href="/admin/reports">Visitors</a>
@@ -42,7 +41,6 @@
 
         <div class="hero-actions">
           <a href="<%= livePath || '/admin/live' %>">Live Chat</a>
-          <a href="<%= otherDashboardPath || '/admin/printer-dashboard' %>"><%= otherDashboardLabel || 'Printer Admin' %></a>
           <a href="/admin/reports">Reports</a>
         <a data-toast-export href="/admin/reports/export?type=all">Export Data</a>
       </div>
@@ -231,7 +229,6 @@
           <h2>Quick Actions</h2>
           <div class="quick-action-grid">
               <a href="<%= livePath || '/admin/live' %>">Open Live Chat</a>
-              <a href="<%= otherDashboardPath || '/admin/printer-dashboard' %>"><%= otherDashboardLabel || 'Printer Admin' %></a>
               <a href="/admin/reports">View Reports</a>
             <a data-toast-export href="/admin/reports/export?type=all">Export Data</a>
           </div>

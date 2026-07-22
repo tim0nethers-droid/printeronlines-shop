@@ -9,11 +9,7 @@
   </div>
   <div class="admin-actions">
     <a class="button secondary" href="<%= liveMode === 'printer' ? '/admin/printer-dashboard' : '/admin/dashboard' %>">Dashboard</a>
-    <% if (liveMode === 'printer') { %>
-      <a class="button secondary" href="/admin/live">Microsoft Admin</a>
-    <% } else if (liveMode === 'microsoft') { %>
-      <a class="button secondary" href="/admin/printer-live">Printer Admin</a>
-    <% } else { %>
+    <% if (liveMode !== 'printer' && liveMode !== 'microsoft') { %>
       <a class="button secondary" href="/admin/printer-live">Printer Live Chat</a>
     <% } %>
     <a class="button secondary" href="/admin/reports">Reports</a>
