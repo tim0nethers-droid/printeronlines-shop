@@ -811,6 +811,26 @@ function adminRedirectTarget(value) {
   return target;
 }
 
+function adminLoginLocals(nextPath, error = '') {
+  const isPrinterLogin = nextPath.startsWith('/admin/printer');
+  return {
+    pageTitle: isPrinterLogin ? 'Printer Admin Login' : 'Admin Login',
+    seoTitle: isPrinterLogin ? 'Printer Admin Login | Printer Help Center' : 'Admin Login | Product Help Portal',
+    seoDescription: isPrinterLogin
+      ? 'Printer admin login for independent printer requests and printer live chat.'
+      : 'Admin login for independent product requests and live chat.',
+    robots: 'noindex, nofollow',
+    error,
+    nextPath,
+    adminLoginMode: isPrinterLogin ? 'printer' : 'microsoft',
+    guidePage: isPrinterLogin,
+    hideSiteFooter: isPrinterLogin,
+    disclaimer: isPrinterLogin
+      ? 'This is an independent printer information and request portal. We are not affiliated with HP, Epson, Canon, Brother, or any printer manufacturer.'
+      : DISCLAIMER
+  };
+}
+
 function filterByDateAndProduct(records, filters) {
   return records.filter((record) => {
     const matchesDate = !filters.date || localDateFromIso(record.createdAt || record.time) === filters.date;
@@ -1566,11 +1586,7 @@ app.patch('/api/chats/:sessionId/status', requireAdminJson, asyncRoute(async (re
 app.get('/admin/login', (req, res, next) => {
   const nextPath = adminRedirectTarget(req.query.next || '');
   if (req.session.isAdmin) return res.redirect(nextPath);
-  return renderPage(req, res, next, 'admin-login', {
-    pageTitle: 'Admin Login',
-    error: '',
-    nextPath
-  });
+  return renderPage(req, res, next, 'admin-login', adminLoginLocals(nextPath));
 });
 
 app.post('/admin/login', loginLimiter, (req, res, next) => {
@@ -1581,11 +1597,13 @@ app.post('/admin/login', loginLimiter, (req, res, next) => {
     req.session.isAdmin = true;
     return res.redirect(nextPath);
   }
-  return renderPage(req, res.status(401), next, 'admin-login', {
-    pageTitle: 'Admin Login',
-    error: 'Invalid admin credentials.',
-    nextPath
-  });
+  return renderPage(
+    req,
+    res.status(401),
+    next,
+    'admin-login',
+    adminLoginLocals(nextPath, 'Invalid admin credentials.')
+  );
 });
 
 app.post('/admin/logout', requireAdmin, (req, res) => {

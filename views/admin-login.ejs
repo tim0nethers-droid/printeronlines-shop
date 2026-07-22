@@ -1,26 +1,42 @@
-<section class="page-hero compact">
-  <div>
-    <span class="eyebrow">Admin</span>
-    <h1>Login</h1>
-    <p>Use the admin credentials configured in the environment.</p>
-    <p class="disclaimer-note"><%= disclaimer %></p>
-  </div>
-</section>
+<% const isPrinterLogin = adminLoginMode === 'printer'; %>
+<section class="admin-login-screen <%= isPrinterLogin ? 'printer-admin-login-screen' : 'microsoft-admin-login-screen' %>">
+  <div class="admin-login-card">
+    <div class="admin-login-brand">
+      <div class="admin-login-logo <%= isPrinterLogin ? 'printer-admin-login-logo' : 'microsoft-admin-login-logo' %>">
+        <span><%= isPrinterLogin ? 'PR' : 'MP' %></span>
+      </div>
+      <div>
+        <strong><%= isPrinterLogin ? 'Printer Help Center' : 'Product Request Portal' %></strong>
+        <small><%= isPrinterLogin ? 'Printer Admin Panel' : 'Admin Panel' %></small>
+      </div>
+    </div>
 
-<section class="section form-section narrow">
-  <form class="portal-form" action="/admin/login" method="post">
-    <input type="hidden" name="next" value="<%= nextPath || '/admin/dashboard' %>">
-    <% if (error) { %>
-      <div class="form-error"><%= error %></div>
-    <% } %>
-    <label>
-      Username
-      <input name="username" autocomplete="username" required>
-    </label>
-    <label>
-      Password
-      <input name="password" type="password" autocomplete="current-password" required>
-    </label>
-    <button class="button primary" type="submit">Login</button>
-  </form>
+    <span class="eyebrow"><%= isPrinterLogin ? 'Printer Admin' : 'Admin' %></span>
+    <h1><%= isPrinterLogin ? 'Printer Admin Login' : 'Admin Login' %></h1>
+    <p class="admin-login-subtitle">
+      <%= isPrinterLogin
+        ? 'Sign in to manage printer requests and printer live chat only.'
+        : 'Use the admin credentials configured in the environment.' %>
+    </p>
+
+    <p class="admin-login-disclaimer"><%= disclaimer %></p>
+
+    <form class="portal-form admin-login-form" action="/admin/login" method="post">
+      <input type="hidden" name="next" value="<%= nextPath || (isPrinterLogin ? '/admin/printer-dashboard' : '/admin/dashboard') %>">
+      <% if (error) { %>
+        <div class="form-error"><%= error %></div>
+      <% } %>
+      <label>
+        Username
+        <input name="username" autocomplete="username" required>
+      </label>
+      <label>
+        Password
+        <input name="password" type="password" autocomplete="current-password" required>
+      </label>
+      <button class="button primary <%= isPrinterLogin ? 'printer-login-button' : '' %>" type="submit">
+        <%= isPrinterLogin ? 'Login to Printer Admin' : 'Login' %>
+      </button>
+    </form>
+  </div>
 </section>

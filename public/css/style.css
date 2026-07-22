@@ -2169,6 +2169,168 @@ small {
   }
 }
 
+/* ===== Admin Login Branding Fix ===== */
+.admin-login-screen {
+  min-height: calc(100vh - 86px);
+  padding: 64px 20px;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), transparent 34%),
+    linear-gradient(180deg, #f8fbff 0%, #eef4fb 100%);
+}
+
+.printer-admin-login-screen {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(16, 185, 129, 0.18), transparent 32%),
+    radial-gradient(circle at bottom right, rgba(37, 99, 235, 0.12), transparent 34%),
+    linear-gradient(180deg, #f7fffb 0%, #edf7f3 100%);
+}
+
+.admin-login-card {
+  width: min(480px, 100%);
+  padding: 30px;
+  border: 1px solid #d8e4f2;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.14);
+}
+
+.printer-admin-login-screen .admin-login-card {
+  border-color: rgba(16, 185, 129, 0.34);
+  box-shadow: 0 24px 70px rgba(8, 76, 64, 0.16);
+}
+
+.admin-login-brand {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 24px;
+}
+
+.admin-login-logo {
+  width: 52px;
+  height: 52px;
+  border-radius: 15px;
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  font-size: 17px;
+  font-weight: 950;
+  letter-spacing: 0;
+  box-shadow: 0 16px 30px rgba(37, 99, 235, 0.22);
+}
+
+.microsoft-admin-login-logo {
+  background: linear-gradient(135deg, #2563eb, #38bdf8);
+}
+
+.printer-admin-login-logo {
+  position: relative;
+  background: linear-gradient(135deg, #10b981, #0f766e);
+  box-shadow: 0 16px 30px rgba(16, 185, 129, 0.24);
+}
+
+.printer-admin-login-logo::before {
+  content: "";
+  position: absolute;
+  top: 11px;
+  width: 23px;
+  height: 9px;
+  border-radius: 2px;
+  background: #ffffff;
+  opacity: 0.95;
+}
+
+.printer-admin-login-logo span {
+  position: absolute;
+  bottom: 8px;
+  min-width: 28px;
+  padding: 3px 5px;
+  border-radius: 7px;
+  background: #073b35;
+  font-size: 12px;
+  line-height: 1;
+  text-align: center;
+}
+
+.admin-login-brand strong {
+  display: block;
+  color: #071a38;
+  font-size: 19px;
+  font-weight: 950;
+  line-height: 1.15;
+}
+
+.admin-login-brand small {
+  display: block;
+  margin-top: 3px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.admin-login-card h1 {
+  margin: 8px 0 10px;
+  color: #071a38;
+  font-size: clamp(34px, 5vw, 52px);
+  line-height: 0.98;
+  letter-spacing: 0;
+}
+
+.admin-login-subtitle {
+  margin: 0 0 18px;
+  color: #334155;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.admin-login-disclaimer {
+  margin: 0 0 22px;
+  padding: 13px 14px;
+  border: 1px solid #bfdbfe;
+  border-radius: 14px;
+  background: #eff6ff;
+  color: #24364d;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.55;
+}
+
+.printer-admin-login-screen .admin-login-disclaimer {
+  border-color: rgba(16, 185, 129, 0.28);
+  background: #ecfdf5;
+}
+
+.admin-login-form {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+.admin-login-form .button {
+  width: 100%;
+  min-height: 52px;
+}
+
+.admin-login-form .printer-login-button {
+  background: linear-gradient(135deg, #0f766e, #10b981);
+  box-shadow: 0 16px 36px rgba(16, 185, 129, 0.24);
+}
+
+@media (max-width: 560px) {
+  .admin-login-screen {
+    padding: 26px 14px;
+  }
+
+  .admin-login-card {
+    padding: 22px;
+    border-radius: 20px;
+  }
+}
+
 /* ===== Standalone Printer Section ===== */
 .printer-site {
   background:
