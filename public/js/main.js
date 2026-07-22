@@ -114,7 +114,7 @@
   }
 
   function setupMobileMenus() {
-    var headers = Array.prototype.slice.call(document.querySelectorAll('.site-header, .guide-header'));
+    var headers = Array.prototype.slice.call(document.querySelectorAll('.site-header, .guide-header, .printer-hub-header'));
     headers.forEach(function (header) {
       var toggle = header.querySelector('.mobile-menu-toggle');
       var panel = header.querySelector('.mobile-menu-panel');

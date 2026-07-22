@@ -1388,6 +1388,7 @@ app.get('/chat', (req, res, next) => {
 app.get('/printer-chat', (req, res, next) => {
   const selectedProduct = selectedProductFrom(req.query.product || 'printer');
   const product = isPrinterProductSlug(selectedProduct.slug) ? selectedProduct : selectedProductFrom('printer');
+  const printerDisclaimer = 'This is an independent printer information and request portal. We are not affiliated with HP, Epson, Canon, Brother, or any printer manufacturer.';
   renderPage(req, res, next, 'chat', {
     pageTitle: 'Printer Live Chat | Product Help Portal',
     seoTitle: 'Printer Live Chat | Independent Printer Guide Portal',
@@ -1396,6 +1397,8 @@ app.get('/printer-chat', (req, res, next) => {
     canonicalUrl: absoluteUrl('/printer-chat'),
     robots: 'noindex, follow',
     guidePage: true,
+    hideSiteFooter: true,
+    disclaimer: printerDisclaimer,
     selectedProduct: product,
     chatIssueOptions: chatIssueOptionsFor(product),
     isPrinterChat: true,
