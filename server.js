@@ -794,12 +794,21 @@ function requireAdmin(req, res, next) {
   if (req.path.startsWith('/admin/api')) {
     return res.status(401).json({ error: 'Admin session expired. Please log in again.' });
   }
-  return res.redirect('/admin/login');
+  return res.redirect(`/admin/login?next=${encodeURIComponent(req.originalUrl || '/admin/dashboard')}`);
 }
 
 function requireAdminJson(req, res, next) {
   if (req.session && req.session.isAdmin) return next();
   return res.status(401).json({ error: 'Admin session expired. Please log in again.' });
+}
+
+function adminRedirectTarget(value) {
+  const target = cleanText(value, 240);
+  if (!target || !target.startsWith('/admin/')) return '/admin/dashboard';
+  if (target.startsWith('/admin/login') || target.startsWith('/admin/logout') || target.startsWith('/admin/api')) {
+    return '/admin/dashboard';
+  }
+  return target;
 }
 
 function filterByDateAndProduct(records, filters) {
@@ -1498,23 +1507,27 @@ app.patch('/api/chats/:sessionId/status', requireAdminJson, asyncRoute(async (re
 }));
 
 app.get('/admin/login', (req, res, next) => {
-  if (req.session.isAdmin) return res.redirect('/admin/dashboard');
+  const nextPath = adminRedirectTarget(req.query.next || '');
+  if (req.session.isAdmin) return res.redirect(nextPath);
   return renderPage(req, res, next, 'admin-login', {
     pageTitle: 'Admin Login',
-    error: ''
+    error: '',
+    nextPath
   });
 });
 
 app.post('/admin/login', loginLimiter, (req, res, next) => {
   const username = cleanText(req.body.username, 80);
   const password = String(req.body.password || '');
+  const nextPath = adminRedirectTarget(req.body.next || req.query.next || '');
   if (username === ADMIN_USER && password === ADMIN_PASS) {
     req.session.isAdmin = true;
-    return res.redirect('/admin/dashboard');
+    return res.redirect(nextPath);
   }
   return renderPage(req, res.status(401), next, 'admin-login', {
     pageTitle: 'Admin Login',
-    error: 'Invalid admin credentials.'
+    error: 'Invalid admin credentials.',
+    nextPath
   });
 });
 

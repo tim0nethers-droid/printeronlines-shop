@@ -9,6 +9,7 @@
 
 <section class="section form-section narrow">
   <form class="portal-form" action="/admin/login" method="post">
+    <input type="hidden" name="next" value="<%= nextPath || '/admin/dashboard' %>">
     <% if (error) { %>
       <div class="form-error"><%= error %></div>
     <% } %>
