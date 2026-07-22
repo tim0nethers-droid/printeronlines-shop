@@ -1,23 +1,31 @@
 <div class="printer-hub-page">
   <header class="printer-hub-header">
-    <a class="printer-hub-brand" href="/printer" aria-label="Printer page home">
-      <span class="printer-hub-mark">PR</span>
-      <span>
-        <strong>Printer Help Center</strong>
-        <small>Independent printer guides</small>
-      </span>
-    </a>
+    <div class="printer-hub-header-inner">
+      <a class="printer-hub-brand" href="/printer" aria-label="Printer page home">
+        <span class="printer-hub-mark">
+          <span class="printer-mark-paper"></span>
+          <span class="printer-mark-slot"></span>
+        </span>
+        <span>
+          <strong>Printer Help Center</strong>
+          <small>Independent Printer Guidance</small>
+        </span>
+      </a>
 
-    <nav class="printer-hub-nav" aria-label="Printer navigation">
-      <a href="/printer">Home</a>
-      <a href="#brands">Brands</a>
-      <a href="#services">Services</a>
-      <a href="#supplies">Ink & Toner</a>
-      <a href="#setup">Setup</a>
-      <a href="#contact">Contact</a>
-    </nav>
+      <nav class="printer-hub-nav" aria-label="Printer navigation">
+        <a href="/printer">Home</a>
+        <a href="#brands">Support</a>
+        <a href="#services">Services</a>
+        <a href="#setup">Drivers</a>
+        <a href="#compare">Compare</a>
+        <a href="#contact">Contact</a>
+      </nav>
 
-    <a class="printer-hub-cta" href="/printer-chat?product=printer">Live Chat</a>
+      <div class="printer-hub-header-actions">
+        <a class="printer-hub-icon-link" href="/printer-chat?product=printer" aria-label="Open printer chat">?</a>
+        <a class="printer-hub-cta" href="/printer-chat?product=printer">Get Help Now</a>
+      </div>
+    </div>
   </header>
 
   <section class="printer-hub-hero">
@@ -134,7 +142,7 @@
       </div>
     </section>
 
-    <section class="printer-hub-section">
+    <section class="printer-hub-section" id="compare">
       <div class="printer-hub-section-head">
         <span class="printer-hub-pill">Compare</span>
         <h2>Find the Right Printer Type</h2>
@@ -196,36 +204,59 @@
   </main>
 
   <footer class="printer-hub-footer">
-    <div>
-      <div class="printer-hub-brand footer-brand-lockup">
-        <span class="printer-hub-mark">PR</span>
-        <span>
-          <strong>Printer Help Center</strong>
-          <small>Independent printer information portal</small>
-        </span>
+    <div class="printer-hub-footer-inner">
+      <div class="printer-hub-footer-brand">
+        <div class="printer-hub-brand footer-brand-lockup">
+          <span class="printer-hub-mark">
+            <span class="printer-mark-paper"></span>
+            <span class="printer-mark-slot"></span>
+          </span>
+          <span>
+            <strong>Printer Help Center</strong>
+            <small>Independent printer information portal</small>
+          </span>
+        </div>
+        <p>Independent printer guides, supplies information, and request intake for common setup, driver, wireless, offline, ink, toner, cartridge, drum, scanner, and accessory questions.</p>
+        <a class="printer-hub-footer-chat" href="/printer-chat?product=printer">Live Chat Support</a>
+        <small class="printer-hub-footer-status">24/7 message intake available</small>
       </div>
-      <p>Independent printer guides, supplies information, and request intake for common setup, driver, wireless, offline, ink, toner, cartridge, drum, scanner, and accessory questions.</p>
+
+      <div>
+        <h3>Quick Links</h3>
+        <a href="/printer">Home</a>
+        <a href="/printer-chat?product=hp-printer">HP Printer Guide</a>
+        <a href="/printer-chat?product=epson-printer">Epson Printer Guide</a>
+        <a href="/printer-chat?product=canon-printer">Canon Printer Guide</a>
+        <a href="/printer-chat?product=brother-printer">Brother Printer Guide</a>
+      </div>
+
+      <div>
+        <h3>Services</h3>
+        <a href="/printer-chat?product=printer&issue=Printer%20offline">Printer Offline</a>
+        <a href="/printer-chat?product=printer&issue=Wireless%20printer%20setup">Network Setup</a>
+        <a href="/printer-chat?product=printer&issue=Driver%20installation">Driver Installation</a>
+        <a href="/printer-chat?product=printer&issue=Ink%20or%20toner%20question">Ink & Toner</a>
+        <a href="/printer-chat?product=printer&issue=Scanner%20setup">Scanner Setup</a>
+      </div>
+
+      <div>
+        <h3>Resources</h3>
+        <a href="#supplies">Ink & Toner</a>
+        <a href="#setup">Setup Steps</a>
+        <a href="#compare">Compare Printers</a>
+        <a href="/request?product=printer">Submit Request</a>
+        <a href="/contact">Contact</a>
+      </div>
     </div>
-    <div>
-      <h3>Brands</h3>
-      <a href="/printer-chat?product=hp-printer">HP Printer</a>
-      <a href="/printer-chat?product=epson-printer">Epson Printer</a>
-      <a href="/printer-chat?product=canon-printer">Canon Printer</a>
-      <a href="/printer-chat?product=brother-printer">Brother Printer</a>
-    </div>
-    <div>
-      <h3>Services</h3>
-      <a href="/printer-chat?product=printer&issue=Wireless%20printer%20setup">Wireless Setup</a>
-      <a href="/printer-chat?product=printer&issue=Driver%20installation">Driver Installation</a>
-      <a href="/printer-chat?product=printer&issue=Ink%20or%20toner%20question">Ink & Toner</a>
-      <a href="/printer-chat?product=printer&issue=Scanner%20setup">Scanner Setup</a>
-    </div>
-    <div>
-      <h3>Legal</h3>
-      <a href="/privacy-policy">Privacy Policy</a>
-      <a href="/terms">Terms</a>
-      <a href="/disclaimer">Disclaimer</a>
-      <a href="/contact">Contact</a>
+
+    <div class="printer-hub-footer-bottom">
+      <span>&copy; <%= new Date().getFullYear() %> Printer Help Center. All rights reserved.</span>
+      <span>Independent information portal. Not affiliated with HP, Epson, Canon, Brother, or any printer manufacturer.</span>
+      <span>
+        <a href="/privacy-policy">Privacy</a>
+        <a href="/terms">Terms</a>
+        <a href="/disclaimer">Disclaimer</a>
+      </span>
     </div>
   </footer>
 </div>

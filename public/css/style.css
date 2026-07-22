@@ -2408,16 +2408,20 @@ small {
   position: sticky;
   top: 0;
   z-index: 40;
-  min-height: 84px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 16px min(7vw, 72px);
-  background: rgba(255, 255, 255, 0.96);
+  background: rgba(255, 255, 255, 0.98);
   border-bottom: 1px solid #dbe7f4;
   box-shadow: 0 14px 40px rgba(15, 23, 42, 0.07);
   backdrop-filter: blur(12px);
+}
+
+.printer-hub-header-inner {
+  width: min(1180px, calc(100% - 40px));
+  min-height: 86px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 28px;
 }
 
 .printer-hub-brand,
@@ -2437,14 +2441,48 @@ small {
 .printer-hub-mark {
   width: 48px;
   height: 48px;
-  display: inline-flex;
+  position: relative;
+  display: inline-grid;
   align-items: center;
   justify-content: center;
   border-radius: 14px;
-  color: #ffffff;
-  background: linear-gradient(135deg, #0068b3, #1d4ed8);
+  color: transparent;
+  background: linear-gradient(135deg, #0068b3, #14b8a6);
   font-weight: 950;
-  box-shadow: 0 18px 34px rgba(37, 99, 235, 0.24);
+  box-shadow: 0 18px 34px rgba(0, 104, 179, 0.24);
+  overflow: hidden;
+}
+
+.printer-mark-paper {
+  position: absolute;
+  top: 9px;
+  left: 13px;
+  width: 22px;
+  height: 12px;
+  border-radius: 2px 2px 0 0;
+  background: #ffffff;
+  box-shadow: inset 0 -3px 0 #bfdbfe;
+}
+
+.printer-mark-slot {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  height: 13px;
+  border-radius: 999px;
+  background: #0f172a;
+}
+
+.printer-mark-slot::after {
+  content: "";
+  position: absolute;
+  right: 5px;
+  top: 4px;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: #22c55e;
 }
 
 .printer-hub-brand strong {
@@ -2463,19 +2501,40 @@ small {
 .printer-hub-nav {
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  gap: 8px;
 }
 
 .printer-hub-nav a {
   color: #334155;
-  padding: 10px 13px;
-  border-radius: 12px;
+  padding: 10px 14px;
+  border-radius: 999px;
   font-weight: 850;
 }
 
 .printer-hub-nav a:hover {
   color: #0b3b78;
   background: #eff6ff;
+}
+
+.printer-hub-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.printer-hub-icon-link {
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  color: #0b3b78;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  font-weight: 950;
+  text-decoration: none;
 }
 
 .printer-hub-cta,
@@ -2894,23 +2953,40 @@ small {
 }
 
 .printer-hub-footer {
-  display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr 1fr;
-  gap: 34px;
-  padding: 46px min(7vw, 72px) 34px;
   background: #071a38;
   color: #dbeafe;
+  padding: 52px 0 22px;
+}
+
+.printer-hub-footer-inner {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.55fr 1fr 1fr 1fr;
+  gap: 38px;
+  align-items: start;
+}
+
+.printer-hub-footer-brand .printer-hub-brand {
+  color: #ffffff;
+}
+
+.printer-hub-footer-brand .printer-hub-brand small {
+  color: #93c5fd;
 }
 
 .printer-hub-footer p {
   max-width: 520px;
   color: #b9cbe4;
   line-height: 1.7;
+  margin: 18px 0;
 }
 
 .printer-hub-footer h3 {
   margin: 0 0 14px;
   color: #ffffff;
+  font-size: 17px;
+  font-weight: 950;
 }
 
 .printer-hub-footer a {
@@ -2924,15 +3000,58 @@ small {
   color: #60a5fa;
 }
 
+.printer-hub-footer-chat {
+  width: max-content;
+  min-height: 44px;
+  padding: 11px 16px;
+  border-radius: 14px;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #2563eb, #0ea5e9);
+  box-shadow: 0 18px 34px rgba(37, 99, 235, 0.24);
+}
+
+.printer-hub-footer-status {
+  display: block;
+  margin-top: 12px;
+  color: #93c5fd;
+  font-weight: 850;
+}
+
+.printer-hub-footer-bottom {
+  width: min(1180px, calc(100% - 40px));
+  margin: 34px auto 0;
+  padding-top: 18px;
+  border-top: 1px solid rgba(219, 234, 254, 0.16);
+  display: grid;
+  grid-template-columns: 1fr 1.3fr auto;
+  gap: 16px;
+  align-items: center;
+  color: #9fb3d0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.printer-hub-footer-bottom span:last-child {
+  display: inline-flex;
+  gap: 14px;
+}
+
+.printer-hub-footer-bottom a {
+  margin: 0;
+  color: #c7d7ee;
+}
+
 @media (max-width: 1060px) {
-  .printer-hub-header {
-    align-items: flex-start;
-    flex-wrap: wrap;
+  .printer-hub-header-inner {
+    grid-template-columns: 1fr auto;
+    gap: 14px;
+    padding: 14px 0;
   }
 
   .printer-hub-nav {
     order: 3;
-    width: 100%;
+    grid-column: 1 / -1;
+    justify-content: flex-start;
     overflow-x: auto;
     padding-bottom: 4px;
   }
@@ -2940,18 +3059,30 @@ small {
   .printer-hub-hero,
   .printer-hub-brand-grid,
   .printer-hub-supply-grid,
-  .printer-hub-footer {
+  .printer-hub-footer-inner,
+  .printer-hub-footer-bottom {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .printer-hub-footer-bottom span:last-child {
+    grid-column: 1 / -1;
   }
 }
 
 @media (max-width: 720px) {
-  .printer-hub-header {
-    padding: 14px;
+  .printer-hub-header-inner {
+    width: min(100% - 28px, 1180px);
+    grid-template-columns: 1fr;
   }
 
+  .printer-hub-header-actions,
   .printer-hub-cta {
     width: 100%;
+  }
+
+  .printer-hub-header-actions {
+    display: grid;
+    grid-template-columns: 44px 1fr;
   }
 
   .printer-hub-hero {
@@ -2966,7 +3097,8 @@ small {
   .printer-hub-supply-grid,
   .printer-hub-compare-grid,
   .printer-hub-steps,
-  .printer-hub-footer {
+  .printer-hub-footer-inner,
+  .printer-hub-footer-bottom {
     grid-template-columns: 1fr;
   }
 
@@ -2987,7 +3119,12 @@ small {
   }
 
   .printer-hub-footer {
-    padding: 34px 18px;
+    padding: 38px 0 22px;
+  }
+
+  .printer-hub-footer-inner,
+  .printer-hub-footer-bottom {
+    width: min(100% - 28px, 1180px);
   }
 }
 
