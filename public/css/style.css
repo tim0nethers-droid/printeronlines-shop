@@ -2549,6 +2549,114 @@ canvas {
   }
 }
 
+/* ===== Printer Mobile Visual Polish ===== */
+@media (max-width: 720px) {
+  .printer-hub-page {
+    background: #f3f7fb !important;
+  }
+
+  .printer-hub-page .printer-hub-header {
+    background: #f8fbff !important;
+    border-bottom: 1px solid #dbe7f4 !important;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08) !important;
+  }
+
+  .printer-hub-page .printer-hub-header-inner {
+    gap: 10px !important;
+  }
+
+  .printer-hub-page .printer-hub-brand {
+    padding: 0 !important;
+    gap: 11px !important;
+  }
+
+  .printer-hub-page .printer-hub-brand strong {
+    color: #071a38 !important;
+    line-height: 1.1 !important;
+    text-decoration: none !important;
+  }
+
+  .printer-hub-page .printer-hub-brand small {
+    color: #526070 !important;
+    line-height: 1.2 !important;
+    text-decoration: none !important;
+  }
+
+  .printer-hub-page .printer-hub-header-actions {
+    align-items: stretch !important;
+  }
+
+  .printer-hub-page .printer-hub-icon-link {
+    height: 46px !important;
+    border-radius: 16px !important;
+    background: #eff6ff !important;
+    text-decoration: none !important;
+  }
+
+  .printer-hub-page .printer-hub-cta {
+    min-height: 46px !important;
+    border-radius: 16px !important;
+    background: linear-gradient(135deg, #2563eb, #0284c7) !important;
+    box-shadow: 0 12px 24px rgba(37, 99, 235, 0.22) !important;
+    color: #ffffff !important;
+    text-decoration: none !important;
+  }
+
+  .printer-hub-page .printer-hub-nav {
+    margin-top: 2px !important;
+    padding-top: 10px !important;
+    border-top: 1px solid #e4edf7 !important;
+  }
+
+  .printer-hub-page .printer-hub-nav a {
+    min-height: 38px !important;
+    align-items: center !important;
+    border: 1px solid #dbe7f4 !important;
+    border-radius: 14px !important;
+    background: #ffffff !important;
+    color: #24364d !important;
+    font-size: 14px !important;
+    font-weight: 900 !important;
+    line-height: 1.15 !important;
+    text-decoration: none !important;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04) !important;
+  }
+
+  .printer-hub-page .printer-hub-nav a:hover,
+  .printer-hub-page .printer-hub-nav a:focus-visible {
+    border-color: #93c5fd !important;
+    background: #eff6ff !important;
+    color: #0b3b78 !important;
+  }
+
+  .printer-hub-page .printer-hub-hero {
+    margin-top: 0 !important;
+    background: linear-gradient(160deg, #0068b3 0%, #0f766e 100%) !important;
+  }
+
+  .printer-hub-page .printer-hub-pill {
+    max-width: 100% !important;
+    font-size: 12px !important;
+    white-space: normal !important;
+  }
+}
+
+@media (max-width: 430px) {
+  .printer-hub-page .printer-hub-nav {
+    gap: 7px !important;
+  }
+
+  .printer-hub-page .printer-hub-nav a {
+    min-height: 36px !important;
+    padding: 9px 7px !important;
+    font-size: 13px !important;
+  }
+
+  .printer-hub-page .printer-hub-hero h1 {
+    font-size: clamp(34px, 11vw, 44px) !important;
+  }
+}
+
 /* ===== Printer Chat Header/Footer Shell Fix ===== */
 .printer-chat-header {
   position: sticky;
