@@ -1037,6 +1037,9 @@ app.get('/', (req, res, next) => {
 
 app.get('/printer', (req, res, next) => {
   const guideProducts = printerProducts();
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
   renderPage(req, res, next, 'printer', {
     pageTitle: 'Printer Guide Portal',
     seoTitle: 'Printer Setup and Supplies Guide | Independent Information Portal',
