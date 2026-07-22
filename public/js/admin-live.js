@@ -35,7 +35,8 @@
       if (state.pollHandle) window.clearInterval(state.pollHandle);
       showError('Admin session expired. Please log in again.');
       window.setTimeout(function () {
-        window.location.href = '/admin/login';
+        var nextPath = window.location.pathname + window.location.search;
+        window.location.href = '/admin/login?next=' + encodeURIComponent(nextPath);
       }, 1200);
       throw new Error('session-expired');
     }

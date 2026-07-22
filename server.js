@@ -1589,8 +1589,9 @@ app.post('/admin/login', loginLimiter, (req, res, next) => {
 });
 
 app.post('/admin/logout', requireAdmin, (req, res) => {
+  const nextPath = adminRedirectTarget(req.body.next || req.query.next || '');
   req.session.destroy(() => {
-    res.redirect('/admin/login');
+    res.redirect(`/admin/login?next=${encodeURIComponent(nextPath)}`);
   });
 });
 

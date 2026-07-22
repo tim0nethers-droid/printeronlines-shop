@@ -17,6 +17,7 @@
       <a href="/admin/reports">Visitors</a>
       <a href="<%= dashboardPath || '/admin/dashboard' %>">Settings</a>
       <form class="sidebar-logout" action="/admin/logout" method="post">
+        <input type="hidden" name="next" value="<%= dashboardPath || '/admin/dashboard' %>">
         <button type="submit">Logout</button>
       </form>
     </nav>
