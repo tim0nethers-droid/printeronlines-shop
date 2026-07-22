@@ -2169,6 +2169,271 @@ small {
   }
 }
 
+/* ===== Final Responsive Hardening ===== */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+.site-shell,
+.site-shell main,
+.section,
+.page-hero,
+.product-help-layout,
+.printer-hub-page,
+.admin-page {
+  min-width: 0;
+}
+
+.product-card,
+.popular-card,
+.issue-card,
+.printer-hub-brand-card,
+.printer-hub-service-card,
+.printer-hub-supply-card,
+.printer-listing-grid article,
+.chat-card,
+.admin-table-card,
+.admin-side-card {
+  min-width: 0;
+}
+
+.product-card h3,
+.product-card p,
+.printer-hub-brand-card h3,
+.printer-hub-brand-card p,
+.printer-listing-grid h3,
+.chat-card h1,
+.admin-table td,
+.admin-table th {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 1180px) {
+  .product-grid,
+  .product-grid.wide,
+  .popular-grid,
+  .guide-grid,
+  .issue-grid,
+  .printer-guide-grid,
+  .printer-hub-brand-grid,
+  .printer-hub-supply-grid,
+  .printer-listing-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .printer-topic-grid,
+  .printer-hub-service-grid,
+  .printer-hub-compare-grid,
+  .printer-hub-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .product-help-layout,
+  .printer-hub-hero,
+  .printer-site-hero {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .page-hero,
+  .hero,
+  .home-hero,
+  .product-hero,
+  .fast-help-card,
+  .admin-topbar,
+  .admin-hero {
+    grid-template-columns: 1fr !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .product-hero,
+  .product-hero-left,
+  .product-hero-actions,
+  .card-actions,
+  .hero-actions,
+  .printer-hub-actions,
+  .printer-hub-final-cta div {
+    justify-content: flex-start !important;
+  }
+
+  .product-hero-actions,
+  .card-actions,
+  .hero-actions,
+  .printer-hub-actions,
+  .printer-hub-final-cta div {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+  }
+
+  .admin-table-wrap,
+  .admin-table-card,
+  .table-wrap {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .admin-table,
+  table {
+    min-width: 720px;
+  }
+}
+
+@media (max-width: 720px) {
+  .section,
+  .page-hero,
+  .product-main,
+  .product-sidebar,
+  .printer-hub-section,
+  .printer-hub-final-cta {
+    width: min(100% - 28px, 1180px) !important;
+  }
+
+  .product-grid,
+  .product-grid.wide,
+  .popular-grid,
+  .guide-grid,
+  .issue-grid,
+  .printer-guide-grid,
+  .printer-topic-grid,
+  .printer-hub-brand-grid,
+  .printer-hub-service-grid,
+  .printer-hub-supply-grid,
+  .printer-hub-compare-grid,
+  .printer-listing-grid,
+  .printer-hub-steps {
+    grid-template-columns: 1fr !important;
+  }
+
+  .chat-page,
+  .printer-chat-page {
+    min-height: auto !important;
+    padding: 24px 12px 42px !important;
+  }
+
+  .chat-card {
+    max-width: 100% !important;
+    padding: 20px 14px 16px !important;
+  }
+
+  .chat-card h1 {
+    font-size: clamp(26px, 8vw, 36px) !important;
+  }
+
+  .issue-chip-group {
+    gap: 8px !important;
+  }
+
+  .issue-chip {
+    max-width: 100%;
+    white-space: normal;
+    text-align: left;
+  }
+
+  .printer-hub-header-inner,
+  .printer-chat-header .printer-hub-header-inner {
+    width: min(100% - 24px, 1180px) !important;
+  }
+
+  .printer-hub-nav {
+    overflow: visible !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .site-header,
+  .guide-header {
+    padding: 12px 14px !important;
+  }
+
+  .brand strong,
+  .guide-brand strong,
+  .printer-hub-brand strong {
+    font-size: 15px !important;
+  }
+
+  .brand small,
+  .guide-brand small,
+  .printer-hub-brand small {
+    font-size: 11px !important;
+  }
+
+  .brand-mark,
+  .printer-hub-mark {
+    width: 40px !important;
+    height: 40px !important;
+    flex: 0 0 40px !important;
+  }
+
+  .mobile-menu-panel {
+    left: 8px !important;
+    right: 8px !important;
+    max-height: calc(100vh - 86px);
+    overflow-y: auto !important;
+  }
+
+  .product-card,
+  .printer-hub-brand-card,
+  .printer-hub-service-card,
+  .printer-hub-supply-card,
+  .printer-listing-grid article {
+    padding: 18px !important;
+  }
+
+  .product-logo-large {
+    width: 84px !important;
+    height: 84px !important;
+  }
+
+  .chat-reply-form {
+    grid-template-columns: 1fr !important;
+  }
+
+  .chat-reply-form button,
+  .chat-submit-btn,
+  .printer-hub-btn,
+  .printer-hub-cta,
+  .button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .footer-bottom,
+  .printer-hub-footer-bottom {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    text-align: left !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .chat-start-form input,
+  .chat-start-form textarea,
+  .chat-start-form select,
+  .portal-form input,
+  .portal-form textarea,
+  .portal-form select {
+    font-size: 16px;
+  }
+
+  .chat-card {
+    border-radius: 14px !important;
+  }
+}
+
 /* ===== Printer Chat Header/Footer Shell Fix ===== */
 .printer-chat-header {
   position: sticky;
