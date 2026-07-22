@@ -40,7 +40,12 @@ const slugAliases = new Map([
   ['microsoft-copilot', 'copilot'],
   ['defender', 'windows-defender'],
   ['microsoft-defender', 'windows-defender'],
-  ['store', 'microsoft-store']
+  ['store', 'microsoft-store'],
+  ['hp', 'hp-printer'],
+  ['canon', 'canon-printer'],
+  ['epson', 'epson-printer'],
+  ['brother', 'brother-printer'],
+  ['printer-offline', 'printer']
 ]);
 const writeQueues = new Map();
 
@@ -285,8 +290,19 @@ function chatIssueOptionsFor(product) {
     'OneDrive sync or storage issue',
     'Teams meeting audio/video issue'
   ];
+  const printerIssues = [
+    'Printer offline',
+    'Wireless printer setup',
+    'Driver installation',
+    'Print queue stuck',
+    'Paper jam guidance',
+    'Ink or toner question',
+    'Scanner setup',
+    'Cartridge guidance'
+  ];
   if (product?.slug === 'microsoft') return microsoftIssues;
   if (product?.slug === 'windows') return commonWindows;
+  if (product?.slug && product.slug.includes('printer')) return printerIssues;
   return (product?.categories || []).map(categoryTitle);
 }
 
@@ -317,7 +333,18 @@ function guideAssistantReplies(productSlug, issueCategory) {
     ['blue screen after pop-up or system error', 'Your blue screen or system error question has been received. Please share what appears on screen.'],
     ['blue screen or startup problem', 'Your blue screen or startup question has been received. Please share what appears on screen.']
   ];
-  const matched = (isMicrosoft ? microsoftMap : generalMap).find(([key]) => issue.includes(key));
+  const printerMap = [
+    ['printer offline', 'Your printer offline question has been received. Please share whether the printer is connected by Wi-Fi, USB, or network.'],
+    ['wireless printer setup', 'Your wireless printer setup question has been received. Please share your printer model and connection type.'],
+    ['driver installation', 'Your printer driver installation question has been received. Please share your printer model and device type.'],
+    ['print queue stuck', 'Your print queue question has been received. Please tell if print jobs are stuck, paused, or failing.'],
+    ['paper jam guidance', 'Your paper jam guidance question has been received. Please share where the paper appears stuck.'],
+    ['ink or toner question', 'Your ink or toner question has been received. Please share the supply message shown on the printer or device.'],
+    ['scanner setup', 'Your scanner setup question has been received. Please tell if you are scanning from the printer panel or computer.'],
+    ['cartridge guidance', 'Your cartridge guidance question has been received. Please share the cartridge or supply message shown.']
+  ];
+  const isPrinter = cleanSlug(productSlug).includes('printer');
+  const matched = (isMicrosoft ? microsoftMap : isPrinter ? printerMap : generalMap).find(([key]) => issue.includes(key));
   const guideReply = matched
     ? matched[1]
     : 'Your product question has been received. Please share a few more details so our guide assistant can review it.';
@@ -360,7 +387,13 @@ function relatedProductsFor(product) {
     'windows-11': ['windows', 'windows-update', 'windows-security', 'microsoft-edge'],
     'windows-10': ['windows', 'windows-update', 'windows-security', 'windows-defender'],
     'windows-update': ['windows', 'windows-11', 'windows-10', 'windows-security'],
-    'windows-security': ['windows', 'windows-defender', 'windows-update', 'microsoft-edge']
+    'windows-security': ['windows', 'windows-defender', 'windows-update', 'microsoft-edge'],
+    printer: ['printer-setup', 'hp-printer', 'canon-printer', 'epson-printer'],
+    'printer-setup': ['printer', 'hp-printer', 'canon-printer', 'brother-printer'],
+    'hp-printer': ['printer', 'printer-setup', 'canon-printer', 'epson-printer'],
+    'canon-printer': ['printer', 'printer-setup', 'hp-printer', 'epson-printer'],
+    'epson-printer': ['printer', 'printer-setup', 'hp-printer', 'brother-printer'],
+    'brother-printer': ['printer', 'printer-setup', 'hp-printer', 'canon-printer']
   };
   const slugs = relatedMap[product.slug] || products
     .filter((item) => item.slug !== product.slug)
@@ -969,9 +1002,9 @@ function windowClearCustomerOnline(sessionId) {
 app.get('/', (req, res, next) => {
   renderPage(req, res, next, 'index', {
     pageTitle: 'Product Help Portal | Independent Microsoft Product Guides',
-    seoTitle: 'Product Help Portal | Independent Microsoft Product Guides',
-    seoDescription: 'Independent Microsoft product information portal with Windows, Excel, Word, Outlook, OneDrive, Teams, setup guidance, service requests, and live chat intake.',
-    seoKeywords: 'Microsoft product information portal, Windows help guide, Excel help guide, Word guide, Outlook setup guide, service request portal',
+    seoTitle: 'Product Help Portal | Independent Product and Printer Guides',
+    seoDescription: 'Independent product information portal with Microsoft product guides, printer setup guidance, wireless printer help, service requests, and live chat intake.',
+    seoKeywords: 'Microsoft product information portal, printer setup guide, wireless printer setup, Windows help guide, Excel guide, service request portal',
     canonicalUrl: absoluteUrl('/'),
     popularProducts: products.slice(0, 6),
     featuredProducts: products
@@ -980,10 +1013,10 @@ app.get('/', (req, res, next) => {
 
 app.get('/products', (req, res, next) => {
   renderPage(req, res, next, 'products', {
-    pageTitle: 'Microsoft Product Guides | Independent Product Help Portal',
-    seoTitle: 'Microsoft Product Guides | Independent Product Help Portal',
-    seoDescription: 'Browse independent Microsoft product help guides for Windows, Excel, Word, PowerPoint, Outlook, OneDrive, Teams, Microsoft 365, Edge, Xbox, Surface, Azure, and more.',
-    seoKeywords: 'Microsoft product guides, Windows guide, Excel guide, Outlook setup guide, OneDrive sync guidance, Teams meeting guidance',
+    pageTitle: 'Product and Printer Guides | Independent Product Help Portal',
+    seoTitle: 'Product and Printer Guides | Independent Product Help Portal',
+    seoDescription: 'Browse independent product guides for Microsoft apps, Windows, printer setup, HP Printer, Canon Printer, Epson Printer, Brother Printer, wireless setup, and supplies guidance.',
+    seoKeywords: 'product guides, printer setup guide, HP printer guide, Canon printer guide, Epson printer guide, Microsoft product guides, Windows guide',
     canonicalUrl: absoluteUrl('/products'),
     productList: products
   });

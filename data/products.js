@@ -7,12 +7,12 @@ function product(data) {
   const defaultCategories = (data.categories || []).slice(0, 4).map((item) => item.title.toLowerCase()).join(', ');
   return {
     ...data,
-    subtitle: 'Independent resource - not affiliated with Microsoft Corporation',
+    subtitle: 'Independent resource - not affiliated with Microsoft Corporation or printer manufacturers',
     quickLinks: data.quickLinks || ['Common Issues', 'Setup Guidance', 'Submit Request', 'Request Chat', 'All Products'],
     pageTitle,
     seo: {
       title: `${pageTitle} | Independent Product Help Portal`,
-      description: `Independent ${data.name} guide for ${defaultCategories || 'setup questions'} and service request guidance. Not affiliated with Microsoft Corporation.`,
+      description: `Independent ${data.name} guide for ${defaultCategories || 'setup questions'} and service request guidance. Not affiliated with Microsoft Corporation or printer manufacturers.`,
       keywords: [
         `${data.name} help guide`,
         `${data.name} setup guidance`,
@@ -59,6 +59,114 @@ const products = [
       issue('Service Request Help', 'HELP', 'Help choosing the right category and preparing a safe service request message.', 'service-request-help')
     ],
     quickLinks: ['Product Selection Help', 'Account Sign-in Guidance', 'Setup Guidance', 'Submit Request', 'Request Chat']
+  }),
+  product({
+    slug: 'printer',
+    name: 'Printer',
+    pageTitle: 'Printer Setup and Supplies Guide',
+    iconText: 'PRN',
+    iconClass: 'printer',
+    bannerClass: 'printer-banner',
+    description: 'Printer setup, wireless connection, driver installation, ink, cartridge, drum, and accessory guidance.',
+    categories: [
+      issue('Printer Offline', 'OFF', 'Guidance for printers showing offline, unavailable, or not connected messages.', 'printer-offline'),
+      issue('Wireless Printer Setup', 'WIFI', 'Help with Wi-Fi setup, network selection, and wireless printer connection basics.', 'wireless-printer-setup'),
+      issue('Driver Installation', 'DRV', 'Guidance for locating and installing printer drivers and basic software.', 'driver-installation'),
+      issue('Print Queue Stuck', 'QUE', 'Help with stuck print jobs, paused queues, and restart guidance.', 'print-queue-stuck'),
+      issue('Ink or Toner Question', 'INK', 'General information about ink, toner, cartridge, drum, and supply messages.', 'ink-toner-question'),
+      issue('Scanner Setup', 'SCAN', 'Guidance for scanner setup, scan app settings, and document scanning basics.', 'scanner-setup')
+    ],
+    quickLinks: ['Printer Offline', 'Wireless Printer Setup', 'Driver Installation', 'Ink or Toner Question', 'Submit Request', 'Request Chat']
+  }),
+  product({
+    slug: 'printer-setup',
+    name: 'Printer Setup',
+    pageTitle: 'Printer Setup Guide',
+    iconText: 'SET',
+    iconClass: 'printer-setup',
+    bannerClass: 'printer-setup-banner',
+    description: 'Independent guide for printer installation, USB setup, Wi-Fi setup, mobile printing, and first-page checks.',
+    categories: [
+      issue('New Printer Setup', 'NEW', 'Guidance for preparing a new printer, loading paper, and first-time setup.', 'new-printer-setup'),
+      issue('USB Printer Setup', 'USB', 'Help connecting a printer by USB and checking basic device detection.', 'usb-printer-setup'),
+      issue('Wireless Setup', 'WIFI', 'Guidance for connecting a printer to Wi-Fi or the same network as your device.', 'wireless-setup'),
+      issue('Mobile Printing', 'MOB', 'Help with printing from phones, tablets, and mobile print apps.', 'mobile-printing'),
+      issue('Test Page Guidance', 'TEST', 'Steps for test pages, alignment pages, and setup confirmation.', 'test-page-guidance'),
+      issue('Printer App Setup', 'APP', 'Guidance for companion printer apps and setup utilities.', 'printer-app-setup')
+    ],
+    quickLinks: ['New Printer Setup', 'Wireless Setup', 'Mobile Printing', 'Test Page Guidance', 'Submit Request', 'Request Chat']
+  }),
+  product({
+    slug: 'hp-printer',
+    name: 'HP Printer',
+    pageTitle: 'HP Printer Guide',
+    iconText: 'HP',
+    iconClass: 'hp-printer',
+    bannerClass: 'hp-printer-banner',
+    description: 'Independent HP printer setup, offline, driver, ink, cartridge, and wireless printing guidance.',
+    categories: [
+      issue('HP Printer Offline', 'OFF', 'Guidance for HP printers showing offline or unavailable status.', 'hp-printer-offline'),
+      issue('HP Wireless Setup', 'WIFI', 'Help with HP wireless printer connection and network checks.', 'hp-wireless-setup'),
+      issue('HP Driver Installation', 'DRV', 'Guidance for HP driver and setup utility installation basics.', 'hp-driver-installation'),
+      issue('HP Ink or Cartridge Question', 'INK', 'Information about HP ink, cartridge, toner, and supply messages.', 'hp-ink-cartridge-question'),
+      issue('HP Print Queue Stuck', 'QUE', 'Help with stuck print jobs, paused printer state, and queue checks.', 'hp-print-queue-stuck'),
+      issue('HP Scanner Setup', 'SCAN', 'Guidance for HP scanner setup and scan workflow basics.', 'hp-scanner-setup')
+    ],
+    quickLinks: ['HP Printer Offline', 'HP Wireless Setup', 'HP Driver Installation', 'Submit Request', 'Request Chat']
+  }),
+  product({
+    slug: 'canon-printer',
+    name: 'Canon Printer',
+    pageTitle: 'Canon Printer Guide',
+    iconText: 'CAN',
+    iconClass: 'canon-printer',
+    bannerClass: 'canon-printer-banner',
+    description: 'Independent Canon printer setup, wireless connection, driver, cartridge, and print quality guidance.',
+    categories: [
+      issue('Canon Printer Offline', 'OFF', 'Guidance for Canon printers showing offline or connection problems.', 'canon-printer-offline'),
+      issue('Canon Wireless Setup', 'WIFI', 'Help with Canon Wi-Fi setup, router checks, and network connection basics.', 'canon-wireless-setup'),
+      issue('Canon Driver Installation', 'DRV', 'Guidance for Canon printer driver and software setup.', 'canon-driver-installation'),
+      issue('Canon Cartridge Question', 'INK', 'Information about Canon ink cartridge and supply messages.', 'canon-cartridge-question'),
+      issue('Canon Print Quality', 'CLR', 'Guidance for faded prints, lines, alignment, and nozzle check basics.', 'canon-print-quality'),
+      issue('Canon Scanner Setup', 'SCAN', 'Help with Canon scanner setup and scan utility basics.', 'canon-scanner-setup')
+    ],
+    quickLinks: ['Canon Printer Offline', 'Canon Wireless Setup', 'Canon Print Quality', 'Submit Request', 'Request Chat']
+  }),
+  product({
+    slug: 'epson-printer',
+    name: 'Epson Printer',
+    pageTitle: 'Epson Printer Guide',
+    iconText: 'EPS',
+    iconClass: 'epson-printer',
+    bannerClass: 'epson-printer-banner',
+    description: 'Independent Epson printer setup, Wi-Fi, driver, ink tank, print queue, and scanner guidance.',
+    categories: [
+      issue('Epson Printer Offline', 'OFF', 'Guidance for Epson printers showing offline or connection status messages.', 'epson-printer-offline'),
+      issue('Epson Wireless Setup', 'WIFI', 'Help with Epson wireless setup and Wi-Fi connection checks.', 'epson-wireless-setup'),
+      issue('Epson Driver Installation', 'DRV', 'Guidance for Epson driver, utility, and software setup basics.', 'epson-driver-installation'),
+      issue('Epson Ink Tank Question', 'INK', 'Information about Epson ink tank, cartridge, and supply messages.', 'epson-ink-tank-question'),
+      issue('Epson Print Quality', 'CLR', 'Guidance for lines, faded prints, alignment, and cleaning basics.', 'epson-print-quality'),
+      issue('Epson Scanner Setup', 'SCAN', 'Help with Epson scanner setup and scan app guidance.', 'epson-scanner-setup')
+    ],
+    quickLinks: ['Epson Printer Offline', 'Epson Wireless Setup', 'Epson Print Quality', 'Submit Request', 'Request Chat']
+  }),
+  product({
+    slug: 'brother-printer',
+    name: 'Brother Printer',
+    pageTitle: 'Brother Printer Guide',
+    iconText: 'BR',
+    iconClass: 'brother-printer',
+    bannerClass: 'brother-printer-banner',
+    description: 'Independent Brother printer setup, wireless, driver, toner, drum, and print queue guidance.',
+    categories: [
+      issue('Brother Printer Offline', 'OFF', 'Guidance for Brother printers showing offline or not connected messages.', 'brother-printer-offline'),
+      issue('Brother Wireless Setup', 'WIFI', 'Help with Brother wireless printer setup and network checks.', 'brother-wireless-setup'),
+      issue('Brother Driver Installation', 'DRV', 'Guidance for Brother driver and software installation basics.', 'brother-driver-installation'),
+      issue('Brother Toner or Drum Question', 'TON', 'Information about Brother toner, drum, and supply messages.', 'brother-toner-drum-question'),
+      issue('Brother Print Queue Stuck', 'QUE', 'Help with paused printer state, stuck print jobs, and queue checks.', 'brother-print-queue-stuck'),
+      issue('Brother Scanner Setup', 'SCAN', 'Guidance for Brother scanner setup and scan workflow basics.', 'brother-scanner-setup')
+    ],
+    quickLinks: ['Brother Printer Offline', 'Brother Wireless Setup', 'Brother Toner or Drum Question', 'Submit Request', 'Request Chat']
   }),
   product({
     slug: 'excel',
@@ -519,6 +627,36 @@ const seoOverrides = {
     title: 'Microsoft Outlook Help Guide | Independent Product Help Portal',
     description: 'Independent Outlook help guide for email setup, send/receive issues, calendar questions, app configuration, and sign-in guidance.',
     keywords: ['Microsoft Outlook help guide', 'Outlook setup guide', 'Outlook send receive issue', 'Outlook calendar issue', 'Outlook app configuration']
+  },
+  printer: {
+    title: 'Printer Setup and Supplies Guide | Independent Product Help Portal',
+    description: 'Independent printer guide for offline status, wireless setup, driver installation, print queue issues, ink, toner, cartridges, drums, and scanner setup.',
+    keywords: ['printer setup guide', 'printer offline guidance', 'wireless printer setup', 'printer driver installation', 'ink toner cartridge guide']
+  },
+  'printer-setup': {
+    title: 'Printer Setup Guide | Independent Product Help Portal',
+    description: 'Independent printer setup guide for new printers, USB setup, wireless setup, mobile printing, test pages, and printer app guidance.',
+    keywords: ['printer setup guide', 'new printer setup', 'wireless printer setup', 'USB printer setup', 'mobile printing guide']
+  },
+  'hp-printer': {
+    title: 'HP Printer Guide | Independent Product Help Portal',
+    description: 'Independent HP printer guide for offline status, wireless setup, driver installation, ink or cartridge questions, print queue issues, and scanner setup.',
+    keywords: ['HP printer guide', 'HP printer offline guidance', 'HP wireless printer setup', 'HP driver installation', 'HP ink cartridge guidance']
+  },
+  'canon-printer': {
+    title: 'Canon Printer Guide | Independent Product Help Portal',
+    description: 'Independent Canon printer guide for offline status, wireless setup, driver installation, cartridge questions, print quality, and scanner setup.',
+    keywords: ['Canon printer guide', 'Canon printer offline guidance', 'Canon wireless printer setup', 'Canon driver installation', 'Canon cartridge guidance']
+  },
+  'epson-printer': {
+    title: 'Epson Printer Guide | Independent Product Help Portal',
+    description: 'Independent Epson printer guide for offline status, Wi-Fi setup, driver installation, ink tank questions, print quality, and scanner setup.',
+    keywords: ['Epson printer guide', 'Epson printer offline guidance', 'Epson wireless setup', 'Epson driver installation', 'Epson ink tank guidance']
+  },
+  'brother-printer': {
+    title: 'Brother Printer Guide | Independent Product Help Portal',
+    description: 'Independent Brother printer guide for offline status, wireless setup, driver installation, toner or drum questions, print queue issues, and scanner setup.',
+    keywords: ['Brother printer guide', 'Brother printer offline guidance', 'Brother wireless setup', 'Brother driver installation', 'Brother toner drum guidance']
   }
 };
 
