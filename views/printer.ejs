@@ -94,7 +94,7 @@
       <div class="printer-hub-brand-grid">
         <% printerGuideProducts.filter(function(product) { return product.slug !== 'printer' && product.slug !== 'printer-setup'; }).forEach(function(product) { %>
           <a class="printer-hub-brand-card" href="/printer-chat?product=<%= product.slug %>">
-            <div class="product-logo <%= product.iconClass %>" aria-hidden="true"><span><%= product.iconText %></span></div>
+            <div class="product-logo printer-brand-logo <%= product.iconClass %>" aria-hidden="true"><span><%= product.iconText %></span></div>
             <h3><%= product.name %> Guide</h3>
             <p><%= product.description %></p>
             <span>Get Guidance</span>
