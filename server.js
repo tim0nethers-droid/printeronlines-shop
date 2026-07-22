@@ -759,6 +759,7 @@ function baseLocals(req, extra = {}) {
     robots: extra.robots || (req.path.startsWith('/admin') ? 'noindex, nofollow' : 'index, follow'),
     jsonLd: extra.jsonLd || null,
     guidePage: false,
+    hideSiteFooter: false,
     pageTitle: seoTitle,
     ...extra
   };
