@@ -6,7 +6,7 @@
     <p class="disclaimer-note"><%= disclaimer %></p>
     <div class="hero-actions">
       <a class="button primary" href="#request-form">Start Service Request</a>
-      <a class="button secondary" href="/chat?product=<%= product.slug %>">Message Us</a>
+      <a class="button secondary" href="<%= chatHref(product) %>">Message Us</a>
     </div>
   </div>
   <div class="product-badge">

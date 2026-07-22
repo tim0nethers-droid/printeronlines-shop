@@ -9,9 +9,10 @@
     </div>
 
     <nav class="admin-nav" aria-label="Admin navigation">
-      <a class="active" href="/admin/dashboard">Dashboard</a>
-      <a href="/admin/live">Live Chat <span class="nav-badge"><%= stats.openChats || 0 %></span></a>
-      <a href="/admin/dashboard">Requests <span class="nav-badge"><%= stats.totalRequests || 0 %></span></a>
+        <a class="active" href="/admin/dashboard">Dashboard</a>
+        <a href="/admin/live">Live Chat <span class="nav-badge"><%= stats.openChats || 0 %></span></a>
+        <a href="/admin/printer-live">Printer Chat</a>
+        <a href="/admin/dashboard">Requests <span class="nav-badge"><%= stats.totalRequests || 0 %></span></a>
       <a href="/admin/reports">Reports</a>
       <a href="/admin/reports">Visitors</a>
       <a href="/admin/dashboard">Settings</a>
@@ -38,9 +39,10 @@
         </div>
       </div>
 
-      <div class="hero-actions">
-        <a href="/admin/live">Live Chat</a>
-        <a href="/admin/reports">Reports</a>
+        <div class="hero-actions">
+          <a href="/admin/live">Live Chat</a>
+          <a href="/admin/printer-live">Printer Chat</a>
+          <a href="/admin/reports">Reports</a>
         <a data-toast-export href="/admin/reports/export?type=all">Export Data</a>
       </div>
     </section>
@@ -226,8 +228,9 @@
         <div class="admin-side-card">
           <h2>Quick Actions</h2>
           <div class="quick-action-grid">
-            <a href="/admin/live">Open Live Chat</a>
-            <a href="/admin/reports">View Reports</a>
+              <a href="/admin/live">Open Live Chat</a>
+              <a href="/admin/printer-live">Open Printer Chat</a>
+              <a href="/admin/reports">View Reports</a>
             <a data-toast-export href="/admin/reports/export?type=all">Export Data</a>
           </div>
         </div>

@@ -6,18 +6,18 @@
   <meta name="description" content="Independent product help portal admin panel.">
   <meta name="robots" content="noindex, nofollow">
   <title><%= pageTitle %></title>
-  <link rel="stylesheet" href="/css/style.css?v=20260629-ads-compliance">
-  <link rel="stylesheet" href="/css/admin.css?v=20260629-saas-dashboard">
+  <link rel="stylesheet" href="/css/style.css?v=20260722-printer-live-admin">
+  <link rel="stylesheet" href="/css/admin.css?v=20260722-printer-live-admin">
 </head>
 <body class="admin-page" data-toast="<%= toast || '' %>">
   <div class="toast-container"></div>
   <%- body %>
-  <% if (currentPath.startsWith('/admin/dashboard') || currentPath.startsWith('/admin/live')) { %>
+  <% if (currentPath.startsWith('/admin/dashboard') || currentPath.startsWith('/admin/live') || currentPath.startsWith('/admin/printer-live')) { %>
     <script src="/socket.io/socket.io.js"></script>
   <% } %>
   <script src="/js/admin.js?v=20260630-dashboard-ring"></script>
-  <% if (currentPath.startsWith('/admin/live')) { %>
-    <script src="/js/admin-live.js?v=20260630-guide-assistant-label"></script>
+  <% if (currentPath.startsWith('/admin/live') || currentPath.startsWith('/admin/printer-live')) { %>
+    <script src="/js/admin-live.js?v=20260722-printer-live-admin"></script>
   <% } %>
 </body>
 </html>

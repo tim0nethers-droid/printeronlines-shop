@@ -134,6 +134,12 @@
     return select ? select.value : '';
   }
 
+  function isPrinterChat(chat) {
+    var slug = String(chat.productSlug || '').toLowerCase();
+    var iconClass = String(chat.productIconClass || '').toLowerCase();
+    return slug.indexOf('printer') !== -1 || iconClass.indexOf('printer') !== -1;
+  }
+
   function chatMatchesSearch(chat) {
     if (!state.searchQuery) return true;
     var visitor = chat.visitor || {};
@@ -196,7 +202,8 @@
     if (!list) return;
     var filter = selectedFilter();
     var visibleChats = chats.filter(function (chat) {
-      return (!filter || chat.productSlug === filter) && chatMatchesListFilter(chat) && chatMatchesSearch(chat);
+      var productMatches = !filter || (filter === 'printer-family' ? isPrinterChat(chat) : chat.productSlug === filter);
+      return productMatches && chatMatchesListFilter(chat) && chatMatchesSearch(chat);
     });
     list.innerHTML = '';
 
@@ -588,6 +595,11 @@
     var input = $('adminReply');
     var searchInput = $('adminChatSearch');
     var exportButton = $('exportChatButton');
+    var liveShell = document.querySelector('.admin-live');
+
+    if (productFilter && liveShell && liveShell.dataset.defaultProductFilter) {
+      productFilter.value = liveShell.dataset.defaultProductFilter;
+    }
 
     ['click', 'keydown', 'touchstart'].forEach(function (eventName) {
       document.addEventListener(eventName, unlockAudio, { once: true, passive: true });

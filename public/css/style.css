@@ -1191,6 +1191,27 @@ dd {
   box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
 }
 
+.printer-chat-page {
+  background: linear-gradient(180deg, #ecfdf5 0%, #f8fafc 42%, #ffffff 100%);
+}
+
+.printer-chat-card {
+  background: linear-gradient(180deg, #f0fdfa 0%, #ffffff 46%);
+  border-color: #99f6e4;
+}
+
+.printer-chat-card .chat-status {
+  color: #0f766e;
+}
+
+.printer-chat-card .chat-submit-btn {
+  background: linear-gradient(135deg, #0f766e, #22c55e);
+}
+
+.printer-chat-card .chat-submit-btn:hover {
+  background: linear-gradient(135deg, #115e59, #16a34a);
+}
+
 .chat-product-logo {
   display: flex;
   margin: 0 auto 12px;
@@ -1729,6 +1750,22 @@ small {
   border: 1px solid var(--line);
   border-radius: 8px;
   overflow: hidden;
+}
+
+.printer-admin-live .visitor-panel,
+.printer-admin-live .conversation-panel,
+.printer-admin-live .visitor-details-panel {
+  border-color: #99f6e4;
+}
+
+.printer-admin-live .panel-top {
+  background: linear-gradient(180deg, #ecfdf5, #ffffff);
+}
+
+.printer-admin-live .visitor-item.active,
+.printer-admin-live .visitor-item:hover {
+  border-color: #0f766e;
+  background: #ecfdf5;
 }
 
 .panel-top {

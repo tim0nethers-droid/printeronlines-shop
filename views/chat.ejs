@@ -45,16 +45,16 @@
   </div>
 </header>
 
-<main class="chat-page">
-  <section class="chat-card">
+<main class="chat-page <%= isPrinterChat ? 'printer-chat-page' : '' %>">
+  <section class="chat-card <%= isPrinterChat ? 'printer-chat-card' : '' %>">
     <div class="chat-product-logo product-logo <%= selectedProduct.iconClass %>" aria-hidden="true">
       <span><%= selectedProduct.iconText %></span>
     </div>
 
-    <h1><%= selectedProduct.name %> Help Chat</h1>
+    <h1><%= isPrinterChat ? selectedProduct.name + ' Live Chat' : selectedProduct.name + ' Help Chat' %></h1>
 
-    <p class="chat-subtitle">Independent AI-powered product assistant</p>
-    <p class="chat-disclaimer-small">Not affiliated with Microsoft Corporation</p>
+    <p class="chat-subtitle"><%= isPrinterChat ? 'Independent printer setup and supplies assistant' : 'Independent AI-powered product assistant' %></p>
+    <p class="chat-disclaimer-small"><%= isPrinterChat ? 'Not affiliated with printer manufacturers' : 'Not affiliated with Microsoft Corporation' %></p>
 
     <div class="chat-status">
       <span></span>

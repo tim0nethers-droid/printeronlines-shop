@@ -1,15 +1,20 @@
 <section class="admin-header">
   <div>
     <span class="eyebrow">Admin</span>
-    <h1>Live Chat</h1>
+    <h1><%= liveTitle || 'Live Chat' %></h1>
   </div>
   <div class="admin-actions">
     <a class="button secondary" href="/admin/dashboard">Dashboard</a>
+    <% if (liveMode === 'printer') { %>
+      <a class="button secondary" href="/admin/live">All Live Chat</a>
+    <% } else { %>
+      <a class="button secondary" href="/admin/printer-live">Printer Live Chat</a>
+    <% } %>
     <a class="button secondary" href="/admin/reports">Reports</a>
   </div>
 </section>
 
-<section class="section admin-live">
+<section class="section admin-live <%= liveMode === 'printer' ? 'printer-admin-live' : '' %>" data-default-product-filter="<%= defaultProductFilter || '' %>" data-live-mode="<%= liveMode || 'all' %>">
   <aside class="visitor-panel">
     <div class="panel-top">
       <label>
@@ -19,8 +24,12 @@
       <label>
         Product
         <select id="liveProductFilter">
-          <option value="">All products</option>
-          <% products.forEach((product) => { %>
+          <% if (liveMode === 'printer') { %>
+            <option value="printer-family">All printer chats</option>
+          <% } else { %>
+            <option value="">All products</option>
+          <% } %>
+          <% (liveProducts || products).forEach((product) => { %>
             <option value="<%= product.slug %>">[<%= product.iconText %>] <%= product.name %></option>
           <% }) %>
         </select>

@@ -27,7 +27,7 @@
         </div>
         <div class="card-actions">
           <a class="btn btn-primary" href="/request?product=<%= product.slug %>">Start Request</a>
-          <a class="btn btn-outline" href="/chat?product=<%= product.slug %>">Message Us</a>
+          <a class="btn btn-outline" href="<%= chatHref(product) %>">Message Us</a>
         </div>
       </article>
     <% }) %>

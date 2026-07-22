@@ -252,6 +252,15 @@ function selectedProductFrom(value) {
   return productBySlug.get(slug) || products[0];
 }
 
+function isPrinterProductSlug(slug) {
+  const product = productBySlug.get(cleanSlug(slug));
+  return Boolean(product && (product.slug.includes('printer') || product.iconClass.includes('printer')));
+}
+
+function printerProducts() {
+  return products.filter((product) => isPrinterProductSlug(product.slug));
+}
+
 function withProductMeta(chat) {
   const productMeta = selectedProductFrom(chat.productSlug);
   return {
@@ -488,6 +497,10 @@ async function appendJson(file, item) {
   });
 }
 
+function chatHref(product) {
+  return isPrinterProductSlug(product?.slug) ? `/printer-chat?product=${product.slug}` : `/chat?product=${product.slug}`;
+}
+
 function normalizeChat(chat) {
   if (!chat) return null;
   const productMeta = selectedProductFrom(chat.productSlug || chat.product);
@@ -564,7 +577,12 @@ function chatSummary(chat) {
 async function getChatList(productFilter = '') {
   const chats = await readJson(CHATS_FILE, []);
   const normalized = chats.map(normalizeChat).filter(Boolean);
-  const filtered = productFilter ? normalized.filter((chat) => chat.productSlug === productFilter) : normalized;
+  const filter = cleanSlug(productFilter);
+  const filtered = filter === 'printer-family'
+    ? normalized.filter((chat) => isPrinterProductSlug(chat.productSlug))
+    : filter
+      ? normalized.filter((chat) => chat.productSlug === filter)
+      : normalized;
   return filtered
     .sort((a, b) => new Date(b.lastMessageAt || b.updatedAt || b.createdAt) - new Date(a.lastMessageAt || a.updatedAt || a.createdAt))
     .map(chatSummary);
@@ -714,9 +732,9 @@ function asyncRoute(handler) {
 }
 
 function baseLocals(req, extra = {}) {
-  const defaultTitle = 'Product Help Portal | Independent Microsoft Product Guides';
-  const defaultDescription = 'Independent product help guides, service requests, and live chat for Microsoft products. Not affiliated with Microsoft Corporation.';
-  const defaultKeywords = 'Microsoft product guide, Windows guide, Excel guide, Word guide, Outlook guide, service request portal';
+  const defaultTitle = 'Product Help Portal | Independent Product and Printer Guides';
+  const defaultDescription = 'Independent product and printer help guides, service requests, and live chat intake. Not affiliated with Microsoft Corporation or printer manufacturers.';
+  const defaultKeywords = 'Microsoft product guide, printer setup guide, Windows guide, Excel guide, wireless printer setup, service request portal';
   const canonicalPath = req.path === '/' ? '/' : req.path.replace(/\/+$/, '');
   const seoTitle = extra.seoTitle || extra.pageTitle || defaultTitle;
   const seoDescription = extra.seoDescription || defaultDescription;
@@ -729,6 +747,7 @@ function baseLocals(req, extra = {}) {
     isAdmin: Boolean(req.session && req.session.isAdmin),
     categoryTitle,
     categorySlug,
+    chatHref,
     seoTitle,
     seoDescription,
     seoKeywords: keywordValue,
@@ -1209,12 +1228,38 @@ app.get('/chat', (req, res, next) => {
     guidePage: true,
     selectedProduct,
     chatIssueOptions: chatIssueOptionsFor(selectedProduct),
+    isPrinterChat: false,
     formValues: {
       name: '',
       phone: '',
       email: '',
       product: selectedProduct.slug,
       issueCategory: categoryTitle(selectedProduct.categories[0]) || '',
+      message: ''
+    }
+  });
+});
+
+app.get('/printer-chat', (req, res, next) => {
+  const selectedProduct = selectedProductFrom(req.query.product || 'printer');
+  const product = isPrinterProductSlug(selectedProduct.slug) ? selectedProduct : selectedProductFrom('printer');
+  renderPage(req, res, next, 'chat', {
+    pageTitle: 'Printer Live Chat | Product Help Portal',
+    seoTitle: 'Printer Live Chat | Independent Printer Guide Portal',
+    seoDescription: 'Start an independent printer live chat intake for printer offline, wireless setup, driver installation, print queue, ink, toner, cartridge, and scanner questions.',
+    seoKeywords: 'printer live chat, printer setup guide, printer offline help, wireless printer setup, printer driver guidance',
+    canonicalUrl: absoluteUrl('/printer-chat'),
+    robots: 'noindex, follow',
+    guidePage: true,
+    selectedProduct: product,
+    chatIssueOptions: chatIssueOptionsFor(product),
+    isPrinterChat: true,
+    formValues: {
+      name: '',
+      phone: '',
+      email: '',
+      product: product.slug,
+      issueCategory: categoryTitle(product.categories[0]) || '',
       message: ''
     }
   });
@@ -1493,6 +1538,21 @@ app.post('/admin/tickets/:token/status', requireAdmin, asyncRoute(async (req, re
 app.get('/admin/live', requireAdmin, (req, res, next) => {
   renderAdminPage(req, res, next, 'admin-live', {
     pageTitle: 'Admin Live Chat',
+    liveTitle: 'Live Chat',
+    liveMode: 'all',
+    defaultProductFilter: '',
+    liveProducts: products,
+    toast: ''
+  });
+});
+
+app.get('/admin/printer-live', requireAdmin, (req, res, next) => {
+  renderAdminPage(req, res, next, 'admin-live', {
+    pageTitle: 'Admin Printer Live Chat',
+    liveTitle: 'Printer Live Chat',
+    liveMode: 'printer',
+    defaultProductFilter: 'printer-family',
+    liveProducts: printerProducts(),
     toast: ''
   });
 });

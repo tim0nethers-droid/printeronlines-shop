@@ -23,7 +23,7 @@
     gtag('js', new Date());
     gtag('config', 'AW-18203994396');
   </script>
-  <link rel="stylesheet" href="/css/style.css?v=20260706-chat-hidden-issue-input">
+  <link rel="stylesheet" href="/css/style.css?v=20260722-printer-live-chat">
   <% if (currentPath.startsWith('/admin')) { %>
     <link rel="stylesheet" href="/css/admin.css?v=20260706-chat-issue-dashboard">
   <% } %>
@@ -69,6 +69,7 @@
           </div>
           <a class="<%= currentPath.startsWith('/request') ? 'active' : '' %>" href="/request">Request</a>
           <a class="<%= currentPath.startsWith('/chat') ? 'active' : '' %>" href="/chat">Chat</a>
+          <a class="<%= currentPath.startsWith('/printer-chat') ? 'active' : '' %>" href="/printer-chat">Printer Chat</a>
         </nav>
       </div>
     </header>
@@ -151,9 +152,9 @@
   <% if (currentPath.startsWith('/admin')) { %>
     <script src="/js/admin.js?v=20260629-saas-dashboard"></script>
   <% } %>
-  <% if (currentPath.startsWith('/chat')) { %>
+  <% if (currentPath.startsWith('/chat') || currentPath.startsWith('/printer-chat')) { %>
     <script src="/socket.io/socket.io.js"></script>
-    <script src="/js/chat-live.js?v=20260706-stale-chat-session-fix"></script>
+    <script src="/js/chat-live.js?v=20260722-printer-live-chat"></script>
   <% } %>
   <% if (currentPath.startsWith('/admin/live')) { %>
     <script src="/js/admin-live.js?v=20260629-live-admin"></script>
